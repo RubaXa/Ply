@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<title>Ply :: Tests</title>
+
+	<!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script src="http://code.jquery.com/qunit/qunit-git.js"></script>
+	<link href="http://code.jquery.com/qunit/qunit-git.css" rel="stylesheet"/-->
+
+	<script>
+		if (!window.jQuery) {
+			document.write('<script src="http://local.git/js/jquery.dev.js"><' + '/script>');
+			document.write('<script src="http://local.git/js/qunit/qunit.js"><' + '/script>');
+			document.write('<link href="http://local.git/js/qunit/qunit.css" rel="stylesheet"/>');
+		}
+
+		if (/state=2/.test(location)) {
+//			document.write('<script src="http://local.git/JSSDK/Promise/Promise.js"><' + '/script>');
+		}
+	</script>
+
+	<script>
+		(function () {
+			var defaultOptions = {
+				x: 0,
+				y: 0,
+				button: 0,
+				ctrlKey: false,
+				altKey: false,
+				shiftKey: false,
+				metaKey: false,
+				bubbles: true,
+				cancelable: true
+			};
+
+
+			var eventMatchers = {
+				'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|input|keydown|keyup|blur|resize|scroll)$/,
+				'MouseEvents': /^(?:click|dblclick|mouse(?:down|up|over|move|out))$/
+			};
+
+
+			window.isPhantomJS = /phantomjs/i.test(navigator.userAgent);
+
+			window.simulateEvent = function (element, eventName, opts) {
+				var options = $.extend({}, defaultOptions, opts || {});
+				var oEvent, eventType = null;
+
+				for (var name in eventMatchers) {
+					if (eventMatchers[name].test(eventName)) {
+						eventType = name;
+						break;
+					}
+				}
+
+				if (!eventType) {
+					throw new SyntaxError('Only HTMLEvents and MouseEvents interfaces are supported');
+				}
+
+				if (document.createEvent) {
+					oEvent = document.createEvent(eventType);
+					if (eventType == 'HTMLEvents') {
+						oEvent.initEvent(eventName, options.bubbles, options.cancelable);
+					}
+					else {
+						oEvent.initMouseEvent(eventName, options.bubbles, options.cancelable, window,
+								options.button, options.x, options.y, options.x, options.y,
+								options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, element);
+					}
+					$.extend(oEvent, options);
+					element.dispatchEvent(oEvent);
+				}
+				else {
+					options.clientX = options.x;
+					options.clientY = options.y;
+					var evt = document.createEventObject();
+					oEvent = $.extend(evt, options);
+					element.fireEvent('on' + eventName, oEvent);
+				}
+				return element;
+			};
+
+
+			window.promiseTest = function (name, promise) {
+				asyncTest(name, function () {
+					promise().then(function () {
+						start();
+					}, function (err) {
+						equal([err, err.stack], null, 'fail');
+						start();
+					});
+				});
+			};
+		})();
+	</script>
+
+</head>
+</body>
+
+	<h1 id="qunit-header">Ply :: tests</h1>
+	<h2 id="qunit-banner"></h2>
+	<div id="qunit-testrunner-toolbar"></div>
+	<h2 id="qunit-userAgent"></h2>
+	<ol id="qunit-tests"></ol>
+	<div id="playground"></div>
+
+
+	<!-- lib:css -->
+		<link href="../ply.css" rel="stylesheet"/>
+
+	<!-- lib:src -->
+		<script src="../Ply.js"></script>
+		<script src="../Ply.ui.js"></script>
+
+	<!-- lib:tests -->
+		<script src="./Ply.tests.js"></script>
+		<script src="./Ply.dom.tests.js"></script>
+		<script src="./Ply.effects.tests.js"></script>
+		<script src="./Ply.ui.tests.js"></script>
+
+	<script>
+		if (parent.resolveTest) {
+			test('end', function () {
+				expect(0);
+				parent.resolveTest();
+			});
+		}
+	</script>
+</body>
+</html>

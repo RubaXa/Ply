@@ -23,7 +23,10 @@
     "layer",
     "modal",
     "dialog",
-    "lightbox"
+    "lightbox",
+    "alert",
+    "confirm",
+    "prompt"
   ],
   "author": "Konstantin Lebedev <ibnRubaXa@gmail.com>",
   "license": "MIT"

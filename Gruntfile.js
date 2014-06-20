@@ -32,10 +32,10 @@ module.exports = function (grunt){
 					instrumentedFiles: 'temp/',
 					htmlReport: 'report/coverage',
 					coberturaReport: 'report/',
-					linesThresholdPct: 95,
-					statementsThresholdPct: 95,
-					functionsThresholdPct: 95,
-					branchesThresholdPct: 95
+					linesThresholdPct: 90,
+					statementsThresholdPct: 90,
+					functionsThresholdPct: 90,
+					branchesThresholdPct: 90
 				}
 			}
 		},

@@ -30,7 +30,6 @@ h1 {
 	text-shadow: 0 1px 3px rgba(0,0,0,.2);
 	font-size: 200px;
 	text-align: center;
-	margin-top: 50px;
 	margin-bottom: 50px;
 }
 	h1 u {
@@ -68,11 +67,12 @@ h2 {
 	}
 
 	.example {
+		top: 0;
 		cursor: pointer;
-		opacity: 0.95;
 		position: relative;
+		transition: all 0.3s;
 	}
-		.example:hover:after {
+		.example:after {
 			top: 50%;
 			left: 50%;
 			line-height: 0;
@@ -82,12 +82,17 @@ h2 {
 			font-size: 100px;
 			position: absolute;
 			display: block;
-			opacity: .7;
+			opacity: 0;
+			transition: opacity 0.2s;
 		}
 
 		.example:hover {
-			opacity: 1;
+			top: -5px;
+			box-shadow: 0 2px 8px rgba(0,0,0,.2);
 		}
+			.example:hover:after {
+				opacity: 0.7;
+			}
 
 pre code {
 	background-color: #fff;

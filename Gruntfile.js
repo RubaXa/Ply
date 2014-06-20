@@ -62,5 +62,5 @@ module.exports = function (grunt){
 	grunt.registerTask('es', ['es6transpiler']);
 	grunt.registerTask('build', ['es6transpiler', 'qunit']);
 	grunt.registerTask('min', ['build', 'uglify']);
-	grunt.registerTask('default', ['build']);
+	grunt.registerTask('default', ['min']);
 };

@@ -200,15 +200,16 @@
 
 	/**
 	 * Выбрать элементы по заданному селектору
-	 * @param   {String}  selector
-	 * @returns {Array}
+	 * @param   {String}       selector
+	 * @param   {HTMLElement}  [ctx]
+	 * @returns {HTMLElement}
 	 */
-	function _querySelector(selector) {
+	function _querySelector(selector, ctx) {
 		try {
-			return document.querySelector(selector);
+			return (ctx || document).querySelector(selector);
 		} catch (err) {
 			/* istanbul ignore next */
-			return $(selector);
+			return $(selector, ctx)[0];
 		}
 	}
 
@@ -374,6 +375,9 @@
 			children = spec.children,
 			selector = R_SELECTOR.exec(spec.tag || '')
 		;
+
+		// Это нам больше не нужно
+		delete spec.children;
 
 		// Разбираем селектор
 		spec.tag = selector[1] || 'div';
@@ -563,17 +567,21 @@
 				padding: '20px 20px 40px', // Сницу в два раза больше, так лучше
 				display: 'inline-block',
 				position: 'relative',
-				overflow: 'hidden',
 				textAlign: 'left',
 				whiteSpace: 'normal',
-				verticalAlign: 'middle'
+				verticalAlign: 'middle',
+				transform: 'translate3d(0, 0, 0)'
 			},
 			children: contentEl
 		});
 
 		// Контент часть
 		style && _css(contentEl, style);
-		_css(contentEl, 'backfaceVisibility', 'hidden');
+		_css(contentEl, {
+			overflow: 'hidden',
+			position: 'relative',
+			backfaceVisibility: 'hidden'
+		});
 
 		el.setAttribute(_plyAttr, 'layer');
 		_appendChild(el, contentEl);
@@ -619,8 +627,7 @@
 		// Корневой слой
 		target.wrapEl = _buildDOM({
 			css: {
-				whiteSpace: 'nowrap',
-				transform: 'translate3d(0, 0, 0)'
+				whiteSpace: 'nowrap'
 			}
 		});
 
@@ -772,11 +779,25 @@
 		constructor: Ply,
 
 
-		/**
-		 * Привязать события
-		 * @private
-		 */
-		_bindEvents: function () {
+		/** @private */
+		_activate: function () {
+			if (!this.hasFlag('bodyScroll')) {
+				var bodyEl = this.bodyEl,
+					dummyEl = _buildDOM()
+				;
+
+				// Сохраняем оригинальные значения
+				bodyEl.__of = _css(bodyEl, 'overflow');
+				bodyEl.__pr = _css(bodyEl, 'paddingRight');
+
+				_appendChild(bodyEl, dummyEl);
+				_css(bodyEl, {
+					overflow: 'hidden',
+					paddingRight: bodyEl.offsetWidth - dummyEl.offsetWidth + 'px'
+				});
+				_removeElement(dummyEl);
+			}
+
 			if (this.hasFlag('closeByOverlay')) {
 				_addEvent(this.overlayEl, 'click', this._getHandleEvent('overlay'));
 			}
@@ -785,11 +806,17 @@
 		},
 
 
-		/**
-		 * Отвязать события
-		 * @private
-		 */
-		_unbindEvents: function () {
+		/** @private */
+		_deactivate: function () {
+			if (!this.hasFlag('bodyScroll')) {
+				var bodyEl = this.bodyEl;
+				_css(bodyEl, {
+					overflow: bodyEl.__of,
+					paddingRight: bodyEl.__pr
+				});
+			}
+
+
 			_removeEvent(this.layerEl, 'submit', this._getHandleEvent('submit'));
 			_removeEvent(this.overlayEl, 'click', this._getHandleEvent('overlay'));
 		},
@@ -938,7 +965,7 @@
 			/* istanbul ignore else */
 			if (!_this.visible) {
 				_this.visible = true;
-				_this._bindEvents();
+				_this._activate();
 
 				// Добавить лаер в stack
 				Ply.stack.add(_this);
@@ -948,6 +975,7 @@
 						_appendChild(_this.bodyEl, _this.wrapEl);
 						_this.wrapEl.focus();
 
+						_this.wrapEl.focus();
 						_autoFocus(_this.layerEl);
 						_this.options.open(_this);
 
@@ -973,7 +1001,7 @@
 			/* istanbul ignore else */
 			if (_this.visible) {
 				_this.visible = false;
-				_this._unbindEvents();
+				_this._deactivate();
 
 				// Удалить лаер из stack
 				Ply.stack.remove(_this);
@@ -994,7 +1022,43 @@
 
 
 		/**
-		 * Заменить лаер
+		 * @param   {HTMLElement}  closeEl
+		 * @param   {HTMLElement}  openEl
+		 * @param   {Object}    effects
+		 * @param   {Function}  prepare
+		 * @param   {Function}  [complete]
+		 * @returns {*}
+		 * @private
+		 */
+		_swap: function (closeEl, openEl, effects, prepare, complete) {
+			var _this = this;
+
+			if (_this.visible) {
+				_this.fx.add(() => {
+					return _preloadImage(openEl).then(() => {
+						prepare();
+
+						return _promiseAll([
+							_this._applyEffect(closeEl, 'close.layer', effects),
+							_this._applyEffect(openEl, 'open.layer', effects)
+						]).then(() => {
+							_removeElement(closeEl);
+							complete();
+							_this.wrapEl.focus();
+							_autoFocus(openEl);
+						});
+					});
+				});
+			} else {
+				complete();
+			}
+
+			return _this.fx.queue;
+		},
+
+
+		/**
+		 * Заменить слой
 		 * @param   {Object}  layer
 		 * @param   {Object}  [effect]  эффект замены
 		 * @returns {Promise}
@@ -1005,38 +1069,49 @@
 			var _this = this,
 				ply = _createPly({}, layer, true),
 				effects = (effect || layer.effect) ? Ply.effects.get(effect || layer.effect) : _this.effects,
-				doneFn = () => {
-					_removeElement(_this.layerEl);
-					_removeElement(ply.wrapEl);
-					_appendChild(_this.wrapEl, ply.layerEl);
-
-					_this.el = ply.el;
-					_this.layerEl = ply.layerEl;
-					_this.contentEl = ply.layerEl.firstChild;
-					_this.context.el = _this.layerEl;
-
-					_autoFocus(_this.layerEl);
-				}
+				closeEl = _this.layerEl,
+				openEl = ply.layerEl
 			;
 
+			return _this._swap(closeEl, openEl, effects,
+				() => {
+					_appendChild(_this.bodyEl, _this.wrapEl);
+					_appendChild(_this.bodyEl, ply.wrapEl);
+				},
+				() => {
+					_removeElement(ply.wrapEl);
+					_appendChild(_this.wrapEl, openEl);
 
-			if (_this.visible) {
-				_this.fx.add(() => {
-					return _preloadImage(ply.layerEl).then(() => {
-						_appendChild(_this.bodyEl, _this.wrapEl);
-						_appendChild(_this.bodyEl, ply.wrapEl);
+					_this.el = ply.el;
+					_this.layerEl = openEl;
+					_this.contentEl = openEl.firstChild;
+					_this.context.el = openEl;
+				})
+			;
+		},
 
-						return _promiseAll([
-							_this._applyEffect(_this.layerEl, 'close.layer', effects),
-							_this._applyEffect(ply.layerEl, 'open.layer', effects)
-						]).then(doneFn);
-					});
-				});
-			} else {
-				doneFn();
-			}
 
-			return _this.fx.queue;
+		/**
+		 * Заменить внутренности слоя
+		 * @param   {Object}  layer
+		 * @param   {Object}  [effect]  эффект замены
+		 * @returns {Promise}
+		 */
+		innerSwap: function (layer, effect) {
+			layer.layer = layer.layer || this.options.layer;
+
+			var _this = this,
+				ply = _createPly({}, layer, true),
+				effects = (effect || layer.effect) ? Ply.effects.get(effect || layer.effect) : _this.effects,
+
+				inEl = _querySelector('.ply-inside', ply.layerEl),
+				outEl = _querySelector('.ply-inside', _this.layerEl)
+			;
+
+			return _this._swap(outEl, inEl, effects, () => {
+				_css(outEl, { width: outEl.offsetWidth + 'px', position: 'absolute' });
+				_appendChild(outEl.parentNode, inEl);
+			}, noop);
 		},
 
 
@@ -1047,7 +1122,7 @@
 			_removeElement(this.wrapEl);
 
 			this.visible = false;
-			this._unbindEvents();
+			this._deactivate();
 			this.options.destroy(this);
 		}
 	};

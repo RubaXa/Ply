@@ -112,14 +112,17 @@
 		return {
 			tag: 'form.ply-layer',
 			className: data.mod,
-			children: [
-				ui(':header', data.header),
-				ui(':content', data.content),
-				data.ctrls && ui(':default', {
-					tag: 'div.ply-footer',
-					children: data.ctrls
-				})
-			]
+			children: [{
+				tag: '.ply-inside',
+				children: [
+					ui(':header', data.header),
+					ui(':content', data.content),
+					data.ctrls && ui(':default', {
+						tag: 'div.ply-footer',
+						children: data.ctrls
+					})
+				]
+			}]
 		};
 	});
 
@@ -335,7 +338,7 @@
 							var promise;
 
 							if (rootLayer) {
-								promise = rootLayer.swap(layer, effect);
+								promise = rootLayer[/^inner/.test(effect) ? 'innerSwap' : 'swap'](layer, effect);
 							} else {
 								promise = layer.open();
 								rootLayer = layer;

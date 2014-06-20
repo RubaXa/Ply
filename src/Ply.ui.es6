@@ -23,7 +23,9 @@
 				block = { text: block };
 			}
 
-			block.name = block.name || name;
+			if (typeof block === 'object') {
+				block.name = block.name || name;
+			}
 
 			return block;
 		}

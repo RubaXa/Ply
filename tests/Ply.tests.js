@@ -77,7 +77,7 @@
 
 		equal(new Ply().contentEl.innerHTML, '');
 		equal(new Ply({ el: 'Wow!' }).contentEl.innerHTML, 'Wow!');
-		equal(new Ply({ el: content }).layerEl.innerHTML, '<b>!</b>');
+		equal(new Ply({ el: content }).layerEl.innerHTML.replace(/\sstyle=".*?"/, ''), '<b>!</b>');
 	});
 
 

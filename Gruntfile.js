@@ -46,7 +46,7 @@ module.exports = function (grunt){
 			},
 			dist: {
 				files: {
-					  '<%= pkg.exportName %>.min.js': ['<%= pkg.exportName %>.js']
+					  '<%= pkg.exportName %>.min.js': ['Ply.js', 'Ply.ui.js']
 				}
 			}
 		}
@@ -60,7 +60,7 @@ module.exports = function (grunt){
 
 
 	grunt.registerTask('es', ['es6transpiler']);
-	grunt.registerTask('build', ['es6transpiler', 'qunit']);
-	grunt.registerTask('min', ['build', 'uglify']);
-	grunt.registerTask('default', ['min']);
+	grunt.registerTask('build', ['es', 'qunit']);
+	grunt.registerTask('min', ['uglify']);
+	grunt.registerTask('default', ['build', 'min']);
 };

@@ -31,7 +31,7 @@ Ply.dialog("alert", "Wow!").then(function (ui) {
 var ply = new Ply({
 	el: "...", // HTML-content
 
-	effect: "fade", // cuurent effect
+	effect: "fade", // or ["open-effect:duration", "close-effect:duration"]
 
 	layer: {}, // default css
 
@@ -64,8 +64,10 @@ ply.open().then(function () {
 ```
 
 
+---
 
-## Effects
+
+## Preset effects
  - fade
  - scale
  - fall
@@ -75,7 +77,28 @@ ply.open().then(function () {
 
 
 
-## Combined Effects
+### Combined effects
 ```js
 Ply.dialog("alert", { effect: ["fade", "scale"] }, "Fade & scale");
 ```
+
+
+### Custom effects
+```js
+Ply.effects["my-effect"] = {
+	open:  { layer: "fade-in", overlay: "background-in" },
+	close: { layer: "fade-out", overlay: "background-out" }
+};
+
+Ply.effects["background-in"] = {
+	"from": { opacity: 0, backgroundColor: "red" },
+	"to":   { opacity: 1, backgroundColor: "white" }
+};
+
+Ply.effects["background-out"] = {
+	"from": { opacity: 1, backgroundColor: "white" },
+	"to":   { opacity: 0, backgroundColor: "green" }
+};
+```
+
+---

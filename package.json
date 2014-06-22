@@ -23,6 +23,7 @@
     "layer",
     "modal",
     "dialog",
+    "popup",
     "lightbox",
     "alert",
     "confirm",

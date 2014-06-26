@@ -2,16 +2,18 @@
 Amazing layer/modal/dialog system. Wow!
 
 
+
 ## Features
  * Support browsers Chrome 20+, FireFox 20+, Safari 6+, Opera 12+, IE8+ (in progress)
  * [ES6 syntax](https://github.com/termi/es6-transpiler)
  * No jQuery (but then need polyfill [Promise](https://gist.github.com/RubaXa/8501359) polyfill)
+ * More than 90% [test code coverage](http://rubaxa.github.io/Ply/tests/)
 
 
 
 ## Base usage
 
-Include [ply.css] in `<head/>`
+Include [ply.css](ply.css) in `<head/>` (optional)
 ```html
 	<link href='./ply.css' rel='stylesheet' type='text/css'/>
 ```
@@ -23,6 +25,40 @@ Ply.dialog("alert", "Wow!").then(function (ui) {
 	ui.state; // true — "OK", false — "cancel"
 });
 ```
+
+
+---
+
+
+## Dialogs
+
+```js
+Ply.dialog({
+	"init-state": {
+		ui: "alert",
+		data: "Wow!",
+		next: "other-step"
+		nextEffect: "3d-flip[180,-180]"
+	},
+
+	"other-step": {
+		ui: "confirm",
+		data: {
+			text: "What's next?",
+			ok: "Exit",     // button text
+			cancel: "Back"
+		},
+		back: "init-state",
+		backEffect: "3d-flip[-180,180]"
+	}
+}).then(function (ui) {
+	// ...
+})
+```
+
+
+
+---
 
 
 ## Low-level

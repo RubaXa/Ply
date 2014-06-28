@@ -138,3 +138,9 @@ Ply.effects["background-out"] = {
 ```
 
 ---
+
+
+## Ply.stack
+ * last`:Ply|null`
+ * length`:Number`
+

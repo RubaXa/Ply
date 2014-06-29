@@ -13,7 +13,9 @@
 
 	var gid = 1,
 		noop = (() => {}),
+
 		document = window.document,
+		setTimeout = window.setTimeout,
 
 		$ = window.jQuery
 				|| /* istanbul ignore next */ window.Zepto
@@ -119,7 +121,9 @@
 	 */
 	function _promiseAll(iterable) {
 		// @todo: Поткрыть тестами `Promise.all`
-		return Promise ? /* istanbul ignore next */ Promise.all(iterable) : $.when.apply($, iterable);
+		return Promise
+			? /* istanbul ignore next */ Promise.all(iterable)
+			: $.when.apply($, iterable);
 	}
 
 
@@ -187,7 +191,7 @@
 	 * @private
 	 */
 	function _extend(dst, ...src) {
-		var i = 0, n = src.length, key, obj;
+		var i = 0, n = src.length;
 		for (; i < n; i++) {
 			_each(src[i], (val, key) => {
 				dst[key] = val;
@@ -351,7 +355,7 @@
 
 	/**
 	 * Создание DOM структуры по спецификации
-	 * @param   {Object}  [spec]
+	 * @param   {String|Object|HTMLElement}  [spec]
 	 * @returns {HTMLElement}
 	 * @private
 	 */
@@ -393,7 +397,7 @@
 		delete spec.tag;
 
 		// Определяем свойсва
-		_each(spec, function (value, name) {
+		_each(spec, (value, name) => {
 			if (value) {
 				if (name === 'css') {
 					// Определяем CSS свойства
@@ -786,6 +790,7 @@
 					dummyEl = _buildDOM()
 				;
 
+				// @todo: Покрыть тестами
 				// Сохраняем оригинальные значения
 				bodyEl.__of = _css(bodyEl, 'overflow');
 				bodyEl.__pr = _css(bodyEl, 'paddingRight');
@@ -862,7 +867,8 @@
 		 * @private
 		 */
 		_applyEffect: function (el, name, effects) {
-			return Ply.effects.apply.call(effects || this.effects, el, name);
+			effects = Ply.effects.get(effects || this.effects);
+			return Ply.effects.apply.call(effects, el, name);
 		},
 
 
@@ -956,33 +962,43 @@
 
 
 		/**
-		 * Открыть лаер
+		 * Открыть/закрыть слой
+		 * @param   {Boolean}  state
+		 * @param   {*}  effect
 		 * @returns {Promise}
+		 * @private
 		 */
-		open: function () {
-			var _this = this;
+		_toggleState: function (state, effect) {
+			var _this = this,
+				mode = state ? 'open' : 'close'
+			;
 
 			/* istanbul ignore else */
-			if (!_this.visible) {
-				_this.visible = true;
-				_this._activate();
+			if (_this.visible != state) {
+				_this.visible = state;
+				_this[state ? '_activate' : '_deactivate']();
 
-				// Добавить лаер в stack
-				Ply.stack.add(_this);
+				// Добавить или удалить слой из стека
+				Ply.stack[state ? 'add' : 'remove'](_this);
 
+				// Очередь эффектов
 				_this.fx.add(() => {
 					return _preloadImage(_this.wrapEl).then(() => {
-						_appendChild(_this.bodyEl, _this.wrapEl);
-						_this.wrapEl.focus();
-
-						_this.wrapEl.focus();
-						_autoFocus(_this.layerEl);
-						_this.options.open(_this);
+						if (state) {
+							_appendChild(_this.bodyEl, _this.wrapEl);
+							_this.wrapEl.focus();
+							_autoFocus(_this.layerEl);
+						}
 
 						return _promiseAll([
-							_this._applyEffect(_this.overlayEl, 'open.overlay'),
-							_this._applyEffect(_this.layerEl, 'open.layer')
-						]);
+							_this._applyEffect(_this.overlayEl, mode + '.overlay', effect),
+							_this._applyEffect(_this.layerEl, mode + '.layer', effect)
+						]).then(() => {
+							if (!state) {
+								_removeElement(_this.wrapEl);
+							}
+							_this.options[mode](_this);
+						});
 					});
 				});
 			}
@@ -992,32 +1008,22 @@
 
 
 		/**
-		 * Закрыть лаер
+		 * Открыть слой
+		 * @param   {*}  [effect]
 		 * @returns {Promise}
 		 */
-		close: function () {
-			var _this = this;
+		open: function (effect) {
+			return this._toggleState(true, effect);
+		},
 
-			/* istanbul ignore else */
-			if (_this.visible) {
-				_this.visible = false;
-				_this._deactivate();
 
-				// Удалить лаер из stack
-				Ply.stack.remove(_this);
-
-				_this.fx.add(() => {
-					return _promiseAll([
-						_this._applyEffect(_this.overlayEl, 'close.overlay'),
-						_this._applyEffect(_this.layerEl, 'close.layer')
-					]).then(() => {
-						_removeElement(_this.wrapEl);
-						_this.options.close(_this);
-					});
-				});
-			}
-
-			return _this.fx.queue;
+		/**
+		 * Закрыть слой
+		 * @param   {*}  [effect]
+		 * @returns {Promise}
+		 */
+		close: function (effect) {
+			return this._toggleState(false, effect);
 		},
 
 
@@ -1376,7 +1382,7 @@
 						}
 
 						// Ждем завершения анимации
-						setTimeout(resolve, effect.duration);
+						setTimeout(resolve, support.transition && effect.duration);
 					}).then(_nextTick(() => {
 						// Возвращаем стили, именно на "then" с разрывом, т.к. «Обещания» могу быть ассинхронными
 						el.setAttribute('style', oldStyle[0]);
@@ -1531,9 +1537,8 @@
 
 
 	/**
-	 * @class Ply.Context
-	 * @param el
-	 * @constructor
+	 * @class  Ply.Context
+	 * @param  {HTMLElement}  el
 	 */
 	function Context(el) {
 		this.el = el;

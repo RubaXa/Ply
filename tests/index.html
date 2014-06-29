@@ -6,9 +6,10 @@
 
 	<title>Ply :: Tests</title>
 
-	<!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<script src="http://code.jquery.com/qunit/qunit-git.js"></script>
-	<link href="http://code.jquery.com/qunit/qunit-git.css" rel="stylesheet"/-->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/qunit/1.14.0/qunit.min.js"></script>
+	<link href="http://code.jquery.com/qunit/qunit-git.css" rel="stylesheet"/>
+
 
 	<script>
 		if (!window.jQuery) {
@@ -114,6 +115,7 @@
 	<!-- lib:src -->
 		<script src="../Ply.js"></script>
 		<script src="../Ply.ui.js"></script>
+		<script>!window.Ply && document.write('<link href="../Ply.min.js" rel="stylesheet"/>');</script>
 
 	<!-- lib:tests -->
 		<script src="./Ply.tests.js"></script>

@@ -155,3 +155,53 @@ Ply.effects["background-out"] = {
  * transformStyle`:String|Boolean`
  * transformOrigin`:String|Boolean`
  * backfaceVisibility`:String|Boolean`
+
+
+---
+
+
+## Ply.lang (localization)
+ * ok`:String` — "OK"
+ * cancel:`String` — "Cancel"
+
+
+---
+
+
+## Ply.defaults
+ * layer`:Object` — `{}`
+ * overlay`:Object` — `{ opacity: 0.6, backgroundColor: 'rgb(0, 0, 0)' }`
+ * flags`:Object` — `{ bodyScroll: false, closeByEsc: true, closeByOverlay: true }`
+
+
+---
+
+
+## Ply.dom
+
+#### build(tag`:String|Object`)`:HTMLElement`
+```js
+Ply.build(); // <div/>
+Ply.build("input"); // <input/>
+Ply.build(".foo"); // <div class="foo"/>
+Ply.build(".foo.bar"); // <div class="foo bar"/>
+Ply.build({  // <input type="password" class="foo" style="padding: 10px" maxlength="32"/>
+	tag: "input.foo",
+	type: "password",
+	css: { padding: "10px" },
+	maxlength: 32
+});
+Ply.build({ text: "<i>?</i>" }); // <div>&lt;i&gt;?&lt;/i&gt;</div>
+Ply.build({ html: "<i>!</i>" }); // <div><i>!</i></div>
+```
+
+#### append(parent`:HTMLElement`, el`:HTMLElement`)
+
+#### remove(el`:HTMLElement`)
+
+#### addEvent(el`:HTMLElement`, name`:String`, fn`:Function`)
+
+#### removeEvent(el`:HTMLElement`, name`:String`, fn`:Function`)
+
+
+

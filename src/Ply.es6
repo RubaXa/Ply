@@ -702,11 +702,6 @@
 			bodyScroll: false,
 			closeByEsc: true,
 			closeByOverlay: true
-		},
-
-		lang: {
-			ok: 'OK',
-			cancel: 'Cancel'
 		}
 	};
 
@@ -1544,8 +1539,9 @@
 		this.el = el;
 	}
 
-	Context.prototype = /** @lends Ply.Context */{
+	Context.fn = Context.prototype = /** @lends Ply.Context */{
 		constructor: Context,
+
 
 		/**
 		 * Получить элемент по имени
@@ -1608,8 +1604,8 @@
 
 	Ply.dom = {
 		build: _buildDOM,
-		appendChild: _appendChild,
-		removeElement: _removeElement,
+		append: _appendChild,
+		remove: _removeElement,
 		addEvent: _addEvent,
 		removeEvent: _removeEvent
 	};

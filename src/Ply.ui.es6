@@ -11,7 +11,7 @@
 		_extend = Ply.extend,
 		_promise = Ply.promise,
 		_buildDOM = Ply.dom.build,
-		_appendChild = Ply.dom.appendChild,
+		_appendChild = Ply.dom.append,
 		_lang = Ply.lang,
 
 		_toBlock = (block, name) => {

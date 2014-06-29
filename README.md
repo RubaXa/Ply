@@ -144,3 +144,14 @@ Ply.effects["background-out"] = {
  * last`:Ply|null`
  * length`:Number`
 
+
+---
+
+
+## Ply.support
+ * transition`:String|Boolean`
+ * transform`:String|Boolean`
+ * perspective`:String|Boolean`
+ * transformStyle`:String|Boolean`
+ * transformOrigin`:String|Boolean`
+ * backfaceVisibility`:String|Boolean`

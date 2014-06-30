@@ -330,7 +330,7 @@
 	 * @private
 	 */
 	function _css(el, prop, val) {
-		if (el && el.style) {
+		if (el && el.style && prop) {
 			if (prop instanceof Object) {
 				for (var name in prop) {
 					_css(el, name, prop[name]);
@@ -561,11 +561,11 @@
 	/**
 	 * Создать лаер с контентом
 	 * @param   {HTMLElement} contentEl
-	 * @param   {Object}      style   стили лаера
+	 * @param   {Object}      options
 	 * @returns {HTMLElement}
 	 * @private
 	 */
-	function _createLayer(contentEl, style) {
+	function _createLayer(contentEl, options) {
 		var el = _buildDOM({
 			css: {
 				padding: '20px 20px 40px', // Сницу в два раза больше, так лучше
@@ -579,8 +579,14 @@
 			children: contentEl
 		});
 
+		// Крестик
+		// @todo: Тесты
+		if (options.flags.closeBtn) {
+			_appendChild(contentEl, _buildDOM({ ply: ':close', tag: '.ply-x', text: '✖' }));
+		}
+
 		// Контент часть
-		style && _css(contentEl, style);
+		_css(contentEl, options.layer);
 		_css(contentEl, {
 			overflow: 'hidden',
 			position: 'relative',
@@ -629,11 +635,7 @@
 	 */
 	function _createPly(target, options, onlyLayer) {
 		// Корневой слой
-		target.wrapEl = _buildDOM({
-			css: {
-				whiteSpace: 'nowrap'
-			}
-		});
+		target.wrapEl = _buildDOM({ css: { whiteSpace: 'nowrap' } });
 
 
 		// Затемнение
@@ -659,7 +661,7 @@
 
 
 		// Содержит контент
-		target.layerEl = _createLayer(target.el, options.layer);
+		target.layerEl = _createLayer(target.el, options);
 		target.contentEl = target.layerEl.firstChild;
 		target.context = new Context(target.layerEl);
 
@@ -699,6 +701,7 @@
 		},
 
 		flags: {
+			closeBtn: false,
 			bodyScroll: false,
 			closeByEsc: true,
 			closeByOverlay: true
@@ -722,6 +725,7 @@
 	function Ply(options) {
 		var _this = this;
 
+		// Локальный идентификатор
 		_this.cid = 'c' + gid++;
 
 
@@ -787,8 +791,8 @@
 
 				// @todo: Покрыть тестами
 				// Сохраняем оригинальные значения
-				bodyEl.__of = _css(bodyEl, 'overflow');
-				bodyEl.__pr = _css(bodyEl, 'paddingRight');
+				this.__overflow = _css(bodyEl, 'overflow');
+				this.__paddingRight = _css(bodyEl, 'paddingRight');
 
 				_appendChild(bodyEl, dummyEl);
 				_css(bodyEl, {
@@ -809,10 +813,9 @@
 		/** @private */
 		_deactivate: function () {
 			if (!this.hasFlag('bodyScroll')) {
-				var bodyEl = this.bodyEl;
-				_css(bodyEl, {
-					overflow: bodyEl.__of,
-					paddingRight: bodyEl.__pr
+				_css(this.bodyEl, {
+					overflow: this.__overflow,
+					paddingRight: this.__paddingRight
 				});
 			}
 
@@ -1060,16 +1063,16 @@
 
 		/**
 		 * Заменить слой
-		 * @param   {Object}  layer
+		 * @param   {Object}  options
 		 * @param   {Object}  [effect]  эффект замены
 		 * @returns {Promise}
 		 */
-		swap: function (layer, effect) {
-			layer.layer = layer.layer || this.options.layer;
+		swap: function (options, effect) {
+			options = _extend({}, this.options, options);
 
 			var _this = this,
-				ply = _createPly({}, layer, true),
-				effects = (effect || layer.effect) ? Ply.effects.get(effect || layer.effect) : _this.effects,
+				ply = _createPly({}, options, true),
+				effects = (effect || options.effect) ? Ply.effects.get(effect || options.effect) : _this.effects,
 				closeEl = _this.layerEl,
 				openEl = ply.layerEl
 			;

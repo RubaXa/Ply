@@ -258,6 +258,7 @@
 	ui.factory('dialog-form *', (data) => {
 		return {
 			tag: 'input.ply-input',
+			type: data.type || 'text',
 			name: data.name,
 			value: data.value,
 			required: true,

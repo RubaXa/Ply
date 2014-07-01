@@ -566,7 +566,7 @@
 	 * @private
 	 */
 	function _createLayer(contentEl, options) {
-		var el = _buildDOM({
+		return _buildDOM({
 			css: {
 				padding: '20px 20px 40px', // Сницу в два раза больше, так лучше
 				display: 'inline-block',
@@ -576,27 +576,25 @@
 				verticalAlign: 'middle',
 				transform: 'translate3d(0, 0, 0)'
 			},
-			children: contentEl
+			children: options.baseHtml ? [{
+				ply: 'layer',
+				tag: '.ply-layer',
+				className: options.mod,
+				css: _extend({
+					overflow: 'hidden',
+					position: 'relative',
+					backfaceVisibility: 'hidden'
+				}, options.layer),
+				children: [options.flags.closeBtn && {
+					ply: ':close',
+					tag: '.ply-x',
+					text: Ply.lang.cross
+				}, {
+					tag: '.ply-inside',
+					children: contentEl
+				}]
+			}] : contentEl
 		});
-
-		// Крестик
-		// @todo: Тесты
-		if (options.flags.closeBtn) {
-			_appendChild(contentEl, _buildDOM({ ply: ':close', tag: '.ply-x', text: '✖' }));
-		}
-
-		// Контент часть
-		_css(contentEl, options.layer);
-		_css(contentEl, {
-			overflow: 'hidden',
-			position: 'relative',
-			backfaceVisibility: 'hidden'
-		});
-
-		el.setAttribute(_plyAttr, 'layer');
-		_appendChild(el, contentEl);
-
-		return el;
 	}
 
 
@@ -662,7 +660,7 @@
 
 		// Содержит контент
 		target.layerEl = _createLayer(target.el, options);
-		target.contentEl = target.layerEl.firstChild;
+		target.contentEl = _getContentEl(target.layerEl);
 		target.context = new Context(target.layerEl);
 
 		_appendChild(target.wrapEl, target.layerEl);
@@ -689,6 +687,18 @@
 	}
 
 
+	/**
+	 * Получить ссылку на контент
+	 * @param   {HTMLElement}  layerEl
+	 * @returns {HTMLElement}
+	 * @private
+	 */
+	function _getContentEl(layerEl) {
+		return layerEl.firstChild.lastChild.firstChild;
+	}
+
+
+
 	//
 	//           Настройки по умолчанию
 	//
@@ -701,11 +711,13 @@
 		},
 
 		flags: {
-			closeBtn: false,
+			closeBtn: true,
 			bodyScroll: false,
 			closeByEsc: true,
 			closeByOverlay: true
-		}
+		},
+
+		baseHtml: true
 	};
 
 
@@ -1088,7 +1100,7 @@
 
 					_this.el = ply.el;
 					_this.layerEl = openEl;
-					_this.contentEl = openEl.firstChild;
+					_this.contentEl = _getContentEl(openEl);
 					_this.context.el = openEl;
 				})
 			;
@@ -1097,16 +1109,16 @@
 
 		/**
 		 * Заменить внутренности слоя
-		 * @param   {Object}  layer
+		 * @param   {Object}  options
 		 * @param   {Object}  [effect]  эффект замены
 		 * @returns {Promise}
 		 */
-		innerSwap: function (layer, effect) {
-			layer.layer = layer.layer || this.options.layer;
+		innerSwap: function (options, effect) {
+			options = _extend({}, this.options, options);
 
 			var _this = this,
-				ply = _createPly({}, layer, true),
-				effects = (effect || layer.effect) ? Ply.effects.get(effect || layer.effect) : _this.effects,
+				ply = _createPly({}, options, true),
+				effects = (effect || options.effect) ? Ply.effects.get(effect || options.effect) : _this.effects,
 
 				inEl = _querySelector('.ply-inside', ply.layerEl),
 				outEl = _querySelector('.ply-inside', _this.layerEl)
@@ -1592,7 +1604,8 @@
 	// Export
 	Ply.lang = {
 		ok: 'OK',
-		cancel: 'Cancel'
+		cancel: 'Cancel',
+		cross: '✖'
 	};
 
 	Ply.css = _css;

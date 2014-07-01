@@ -112,19 +112,16 @@
 	// Ply-слой - корневой элемент
 	ui.factory(':root', function (data) {
 		return {
-			tag: 'form.ply-layer',
+			tag: 'form.ply-form',
 			className: data.mod,
-			children: [{
-				tag: '.ply-inside',
-				children: [
-					ui(':header', data.header),
-					ui(':content', data.content),
-					data.ctrls && ui(':default', {
-						tag: 'div.ply-footer',
-						children: data.ctrls
-					})
-				]
-			}]
+			children: [
+				ui(':header', data.header),
+				ui(':content', data.content),
+				data.ctrls && ui(':default', {
+					tag: 'div.ply-footer',
+					children: data.ctrls
+				})
+			]
 		};
 	});
 
@@ -200,7 +197,7 @@
 
 	/**
 	 * Абстрактный диалог
-	 * @param   {String}  mod
+	 * @param   {String}  mod  модификатор
 	 * @param   {Object}  options
 	 * @param   {Object}  data
 	 * @param   {Object}  defaults
@@ -208,10 +205,11 @@
 	 * @private
 	 */
 	function _dialogFactory(mod, options, data, defaults) {
+		options.mod = mod;
 		options.effect = options.effect || 'slide';
+		options.flags = _extend({ closeBtn: false }, options.flags);
 
 		return {
-			mod: mod,
 			header: data.title,
 			content: data.form
 				? { 'dialog-form': { children: data.form } }

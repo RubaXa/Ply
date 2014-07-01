@@ -53,7 +53,7 @@
 
 		// Layer
 		layer = new Ply({ layer: { textAlign: 'center' } });
-		equal(layer.contentEl.style.textAlign, 'center', 'textAlign: center');
+		equal(layer.layerEl.firstChild.style.textAlign, 'center', 'textAlign: center');
 	});
 
 
@@ -73,11 +73,11 @@
 
 	test('content', function () {
 		var content = document.createElement('b');
-		content.innerHTML = '!';
+		content.innerHTML = '<b>!</b>';
 
-		equal(new Ply().contentEl.innerHTML, '');
-		equal(new Ply({ el: 'Wow!' }).contentEl.innerHTML, 'Wow!');
-		equal(new Ply({ el: content }).layerEl.innerHTML.replace(/\sstyle=".*?"/, ''), '<b>!</b>');
+		equal(new Ply({ }).contentEl.innerHTML, '', 'conentEl');
+		equal(new Ply({ el: 'Wow!'  }).contentEl.innerHTML, 'Wow!', 'contentEl');
+		equal(new Ply({ el: content }).contentEl.innerHTML, '<b>!</b>');
 	});
 
 

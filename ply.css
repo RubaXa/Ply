@@ -58,24 +58,28 @@
 	box-shadow: 0 0 3px rgba(0,0,0,.3);
 	background-color: #fff;
 	border-radius: 2px;
-	font-family: "Arial", Helvetica;
 	font-size: 16px;
+	font-family: "Arial", Helvetica;
 }
 	.ply-layer.alert .ply-content,
 	.ply-layer.confirm .ply-content {
-		padding: 40px 30px;
+		padding: 20px 0 15px;
 		text-align: center;
 	}
 
 	.ply-layer.alert .ply-footer,
 	.ply-layer.confirm .ply-footer,
 	.ply-layer.prompt .ply-footer {
+		margin-top: 20px;
 		text-align: center;
-		padding-bottom: 20px;
 	}
 
+.ply-inside {
+	padding: 20px;
+}
 
 .ply-header {
+	margin: -20px -20px 20px;
 	padding: 10px 20px;
 	font-size: 18px;
 	background-color: #f1f1f1;
@@ -83,11 +87,9 @@
 }
 
 .ply-content {
-	padding: 20px;
 }
 
 .ply-footer {
-	padding: 0 20px 15px;
 }
 	.ply-footer button {
 		margin-left: 20px;

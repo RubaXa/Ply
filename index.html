@@ -27,8 +27,10 @@
 
 			<div class="col-left">
 				<div class="ply-layer alert example">
-					<div class="ply-content">Hello %username%!</div>
-					<div class="ply-footer"><button class="ply-ok">OK</button></div>
+					<div class="ply-inside">
+						<div class="ply-content">Hello %username%!</div>
+						<div class="ply-footer"><button class="ply-ok">OK</button></div>
+					</div>
 				</div>
 			</div>
 
@@ -44,8 +46,10 @@
 
 			<div class="col-left">
 				<div class="ply-layer confirm example">
-					<div class="ply-content">Continue?</div>
-					<div class="ply-footer"><button class="ply-ok">OK</button><button class="ply-cancel">Cancel</button></div>
+					<div class="ply-inside">
+						<div class="ply-content">Continue?</div>
+						<div class="ply-footer"><button class="ply-ok">OK</button><button class="ply-cancel">Cancel</button></div>
+					</div>
 				</div>
 			</div>
 
@@ -65,11 +69,13 @@
 
 			<div class="col-left">
 				<div class="ply-layer prompt example">
-					<div class="ply-header">Spam subscribe</div>
-					<div class="ply-content">
-						<input class="ply-input" placeholder="E-mail"/>
+					<div class="ply-inside">
+						<div class="ply-header">Spam subscribe</div>
+						<div class="ply-content">
+							<input class="ply-input" placeholder="E-mail"/>
+						</div>
+						<div class="ply-footer"><button class="ply-ok">OK</button><button class="ply-cancel">Cancel</button></div>
 					</div>
-					<div class="ply-footer"><button class="ply-ok">OK</button><button class="ply-cancel">Cancel</button></div>
 				</div>
 			</div>
 
@@ -103,7 +109,6 @@
 	<script>
 		jQuery(function ($) {
 			hljs.configure({ classPrefix: '' });
-
 
 			$('.example')
 				.each(function () {

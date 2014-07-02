@@ -717,7 +717,14 @@
 			closeByOverlay: true
 		},
 
-		baseHtml: true
+		baseHtml: true,
+
+		// Callback's
+		init: noop,
+		open: noop,
+		close: noop,
+		destroy: noop,
+		callback: noop
 	};
 
 
@@ -742,17 +749,7 @@
 
 
 		// Опции
-		_this.options = options = _extend(/** @lends this.options */{
-			layer: defaults.layer,
-			overlay: defaults.overlay,
-
-			// Callback's
-			init: noop,
-			open: noop,
-			close: noop,
-			destroy: noop,
-			callback: noop
-		}, options);
+		_this.options = options = _extend({}, defaults, options);
 
 
 		// Флаги
@@ -830,7 +827,6 @@
 					paddingRight: this.__paddingRight
 				});
 			}
-
 
 			_removeEvent(this.layerEl, 'submit', this._getHandleEvent('submit'));
 			_removeEvent(this.overlayEl, 'click', this._getHandleEvent('overlay'));
@@ -978,7 +974,7 @@
 		 * @returns {Promise}
 		 * @private
 		 */
-		_toggleState: function (state, effect) {
+		toggleState: function (state, effect) {
 			var _this = this,
 				mode = state ? 'open' : 'close'
 			;
@@ -1023,7 +1019,7 @@
 		 * @returns {Promise}
 		 */
 		open: function (effect) {
-			return this._toggleState(true, effect);
+			return this.toggleState(true, effect);
 		},
 
 
@@ -1033,7 +1029,7 @@
 		 * @returns {Promise}
 		 */
 		close: function (effect) {
-			return this._toggleState(false, effect);
+			return this.toggleState(false, effect);
 		},
 
 
@@ -1184,6 +1180,11 @@
 		add: function (layer) {
 			var idx = array_push.call(this, layer);
 
+			if (this.last) {
+				_css(layer.overlayEl, 'visibility', 'hidden');
+				_css(this.last.layerEl, 'display', 'none');
+			}
+
 			this.last = layer;
 			this._idx[layer.cid] = idx - 1;
 
@@ -1206,7 +1207,10 @@
 				delete this._idx[layer.cid];
 				this.last = this[this.length-1];
 
-				if (!this.last) {
+				if (this.last) {
+					_css(layer.overlayEl, 'visibility', '');
+					_css(this.last.layerEl, 'display', 'inline-block');
+				} else {
 					_removeEvent(document, 'keyup', this._pop);
 				}
 			}

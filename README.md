@@ -77,6 +77,7 @@ var ply = new Ply({
 	},
 
 	flags: { // defaults
+		closeBtn: true, // presence close button "✖"
 		bodyScroll: false, // disable scrollbar at body
 		closeByEsc: true, // close by press on `Esc` key
 		closeByOverlay: true // close by click on the overlay
@@ -163,6 +164,7 @@ Ply.effects["background-out"] = {
 ## Ply.lang (localization)
  * ok`:String` — "OK"
  * cancel:`String` — "Cancel"
+ * cross:`String` — "✖"
 
 
 ---

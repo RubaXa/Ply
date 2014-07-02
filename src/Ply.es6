@@ -577,7 +577,7 @@
 				transform: 'translate3d(0, 0, 0)'
 			},
 			children: options.baseHtml ? [{
-				ply: 'layer',
+				ply: ':layer',
 				tag: '.ply-layer',
 				className: options.mod,
 				css: _extend({
@@ -605,21 +605,16 @@
 	 * @private
 	 */
 	function _createOverlay(style) {
-		var el = _buildDOM();
-
-		if (style) {
-			_css(el, style);
-			_css(el, {
+		return _buildDOM({
+			ply: ':overlay',
+			css: _extend({
 				top: 0,
 				left: 0,
 				right: 0,
 				bottom: 0,
 				position: 'fixed'
-			});
-			el.setAttribute(_plyAttr, 'overlay');
-		}
-
-		return el;
+			}, style)
+		});
 	}
 
 
@@ -811,10 +806,6 @@
 				_removeElement(dummyEl);
 			}
 
-			if (this.hasFlag('closeByOverlay')) {
-				_addEvent(this.overlayEl, 'click', this._getHandleEvent('overlay'));
-			}
-
 			_addEvent(this.wrapEl, 'submit', this._getHandleEvent('submit'));
 		},
 
@@ -829,7 +820,6 @@
 			}
 
 			_removeEvent(this.layerEl, 'submit', this._getHandleEvent('submit'));
-			_removeEvent(this.overlayEl, 'click', this._getHandleEvent('overlay'));
 		},
 
 
@@ -840,7 +830,9 @@
 		 * @private
 		 */
 		_getHandleEvent: function (name) {
-			var _this = this, handleEvent = _this.__handleEvent || (_this.__handleEvent = {});
+			var _this = this,
+				handleEvent = _this.__handleEvent || (_this.__handleEvent = {})
+			;
 
 			if (!handleEvent[name]) {
 				handleEvent[name] = (evt) => {
@@ -908,10 +900,10 @@
 
 			if (!handle) {
 				handle = target;
-				target = 'layer';
+				target = ':layer';
 			}
 
-			handle['_' + target] = ((evt) => {
+			handle['_' + target] = (evt) => {
 				var el = evt.target;
 				do {
 					if (el.nodeType === 1) {
@@ -921,7 +913,7 @@
 					}
 				}
 				while ((el !== _this.wrapEl) && (el = el.parentNode));
-			});
+			};
 
 			_addEvent(_this.wrapEl, event, handle['_' + target]);
 			return _this;
@@ -1170,6 +1162,9 @@
 			if (evt.keyCode === keys.esc && layer.hasFlag('closeByEsc')) {
 				layer.closeBy('esc');
 			}
+			else if (layer.hasFlag('closeByOverlay') && evt.target.getAttribute(_plyAttr) === ':overlay') {
+				layer.closeBy('overlay');
+			}
 		},
 
 
@@ -1181,7 +1176,7 @@
 			var idx = array_push.call(this, layer);
 
 			if (this.last) {
-				_css(layer.overlayEl, 'visibility', 'hidden');
+//				_css(layer.overlayEl, 'visibility', 'hidden');
 				_css(this.last.layerEl, 'display', 'none');
 			}
 
@@ -1189,6 +1184,7 @@
 			this._idx[layer.cid] = idx - 1;
 
 			if (idx === 1) {
+				_addEvent(document, 'click', this._pop);
 				_addEvent(document, 'keyup', this._pop);
 			}
 		},
@@ -1208,9 +1204,10 @@
 				this.last = this[this.length-1];
 
 				if (this.last) {
-					_css(layer.overlayEl, 'visibility', '');
+//					_css(layer.overlayEl, 'visibility', '');
 					_css(this.last.layerEl, 'display', 'inline-block');
 				} else {
+					_removeEvent(document, 'click', this._pop);
 					_removeEvent(document, 'keyup', this._pop);
 				}
 			}

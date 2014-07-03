@@ -181,7 +181,7 @@ Ply.effects["background-out"] = {
 
 ## Ply.dom
 
-#### build(tag`:String|Object`)`:HTMLElement`
+##### build(tag`:String|Object`)`:HTMLElement`
 ```js
 Ply.build(); // <div/>
 Ply.build("input"); // <input/>
@@ -197,13 +197,128 @@ Ply.build({ text: "<i>?</i>" }); // <div>&lt;i&gt;?&lt;/i&gt;</div>
 Ply.build({ html: "<i>!</i>" }); // <div><i>!</i></div>
 ```
 
-#### append(parent`:HTMLElement`, el`:HTMLElement`)
+##### append(parent`:HTMLElement`, el`:HTMLElement`)
 
-#### remove(el`:HTMLElement`)
+##### remove(el`:HTMLElement`)
 
-#### addEvent(el`:HTMLElement`, name`:String`, fn`:Function`)
+##### addEvent(el`:HTMLElement`, name`:String`, fn`:Function`)
 
-#### removeEvent(el`:HTMLElement`, name`:String`, fn`:Function`)
+##### removeEvent(el`:HTMLElement`, name`:String`, fn`:Function`)
 
 
 
+---
+
+
+## Create a dialog template
+
+
+##### Ply.ui(name)`:HTMLElement`
+ * name`:String` — ui-element name
+
+```js
+var el = Ply.ui("btn", {
+	title: "click me",
+	value: "Wow!"
+})
+```
+
+
+##### Ply.ui.factory(name, factory)
+ * name`:String` — ui-element name
+ * factory`:Function` — callback
+
+```js
+Ply.ui.factory("btn", function (data, children) {
+	// data`:Object`
+	// children`:HTMLElement`
+
+	return {
+		"tag": ".btn",
+		"text": data.value
+	};
+});
+
+// or button with icon (optional)
+Ply.ui.factory("btn", function (data, children) {
+	return {
+		"tag": ".btn",
+		"title": data.title
+		"children": [
+			data.icon && { "tag": "span.glyphicon.glyphicon-" + data.icon },
+			{ "tag": "span", "text": data.value }
+		]
+	};
+});
+```
+
+
+##### Ply.factory(name, factory)
+ * name`:String` — template name
+ * factory`:Function` — callback
+
+```js
+Ply.factory("subscribe", function (options, data, resolve) {
+	// options — ply options
+	// data — user data
+	// resolve — done function
+	resolve({
+		"header": "Spam subscribe",
+		"content": {
+			"fieldset": {
+				"name": { label: "Username", value: data.name },
+				"email": { label: "E-mail", value: data.email },
+				"agree": true
+			}
+		},
+		ctrls: {
+			"ok": true,
+			"cancel": "abort" // for example
+		}
+	});
+
+	// OR
+	var element = template(data);
+	resolve(element);
+});
+
+
+Ply.ui.factory("fieldset", function (data, children) {
+	return {
+		tag: ".fieldset",
+		children: children
+	};
+});
+
+
+// Default element in `fieldset`
+Ply.ui.factory("fieldset *", function (data) {
+	var uid = Math.round(Math.random() * 1e9).toString(36);
+	return {
+		tag: ".field",
+		children: [
+			{ tag: "label", forHtml: uid, text: data.label },
+			{ tag: "input", id: uid, name: data.name, value: data.value }
+		]
+	};
+});
+
+
+Ply.ui.factory("fieldset agree", function (data) {
+	var uid = Math.round(Math.random() * 1e9).toString(36);
+	return {
+		tag: ".field",
+		children: [
+			{ tag: "input", type: "checkbox", id: uid, name: "agree", value: "Y" },
+			{ tag: "label", forHtml: uid, text: "I agree." }
+		]
+	};
+});
+
+
+// Usage
+Ply.dialog("subscribe", {
+	"name": "RubaXa",
+	"email": "trash@rubaxa.org",
+});
+```

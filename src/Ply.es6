@@ -607,6 +607,7 @@
 	function _createOverlay(style) {
 		return _buildDOM({
 			ply: ':overlay',
+			tag: '.ply-overlay',
 			css: _extend({
 				top: 0,
 				left: 0,
@@ -695,7 +696,7 @@
 
 
 	//
-	//           Настройки по умолчанию
+	//       Настройки по умолчанию
 	//
 	var defaults = {
 		layer: {},
@@ -726,7 +727,7 @@
 
 
 	//
-	//           Основной код
+	//       Основной код
 	//
 
 
@@ -760,16 +761,22 @@
 
 
 		// Очередь эффектов
-		_this.fx = { queue: _promise((resolve) => { resolve(); }) };
-		_this.fx.add = (executor) => {
-			/* jshint boss:true*/
+		_this.fx = (executor) => {
+			/* jshint boss:true */
 			return !(_this.fx.queue = _this.fx.queue.then(executor, executor).then(() => {
 				return _this;
 			}));
 		};
+		_this.fx.queue = _promise((resolve) => { resolve(); });
 
 
-		// Подписываемся «контрол» «отмена» и «крестик»
+		// Клик по затемнению
+		_this.on('click', ':overlay', () => {
+			_this.hasFlag('closeByOverlay') && _this.closeBy('overlay');
+		});
+
+
+		// Подписываемся кнопку «отмена» и «крестик»
 		_this.on('click', ':close', (evt, el) => {
 			evt.preventDefault();
 			_this.closeBy(el.nodeName === 'BUTTON' ? 'cancel' : 'x');
@@ -980,7 +987,7 @@
 				Ply.stack[state ? 'add' : 'remove'](_this);
 
 				// Очередь эффектов
-				_this.fx.add(() => {
+				_this.fx(() => {
 					return _preloadImage(_this.wrapEl).then(() => {
 						if (state) {
 							_appendChild(_this.bodyEl, _this.wrapEl);
@@ -1038,7 +1045,7 @@
 			var _this = this;
 
 			if (_this.visible) {
-				_this.fx.add(() => {
+				_this.fx(() => {
 					return _preloadImage(openEl).then(() => {
 						prepare();
 
@@ -1162,9 +1169,6 @@
 			if (evt.keyCode === keys.esc && layer.hasFlag('closeByEsc')) {
 				layer.closeBy('esc');
 			}
-			else if (layer.hasFlag('closeByOverlay') && evt.target.getAttribute(_plyAttr) === ':overlay') {
-				layer.closeBy('overlay');
-			}
 		},
 
 
@@ -1175,16 +1179,10 @@
 		add: function (layer) {
 			var idx = array_push.call(this, layer);
 
-			if (this.last) {
-//				_css(layer.overlayEl, 'visibility', 'hidden');
-				_css(this.last.layerEl, 'display', 'none');
-			}
-
 			this.last = layer;
 			this._idx[layer.cid] = idx - 1;
 
 			if (idx === 1) {
-				_addEvent(document, 'click', this._pop);
 				_addEvent(document, 'keyup', this._pop);
 			}
 		},
@@ -1203,11 +1201,7 @@
 				delete this._idx[layer.cid];
 				this.last = this[this.length-1];
 
-				if (this.last) {
-//					_css(layer.overlayEl, 'visibility', '');
-					_css(this.last.layerEl, 'display', 'inline-block');
-				} else {
-					_removeEvent(document, 'click', this._pop);
+				if (!this.last) {
 					_removeEvent(document, 'keyup', this._pop);
 				}
 			}

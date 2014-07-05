@@ -8,6 +8,8 @@ Amazing layer/modal/dialog system. Wow!
  * [ES6 syntax](https://github.com/termi/es6-transpiler)
  * No jQuery (but then need polyfill [Promise](https://gist.github.com/RubaXa/8501359) polyfill)
  * More than 90% [test code coverage](http://rubaxa.github.io/Ply/tests/)
+ * Preloading content before displaying
+ * Smart focus on form elements
 
 
 
@@ -100,6 +102,18 @@ ply.open().then(function () {
 });
 ```
 
+##### open([effect])`:Promise`
+
+##### close(effect)`:Promise`
+
+##### swap(layer[, effect])`:Promise`
+Swapping one layer to another
+
+##### innerSwap(layer[, effect])`:Promise`
+Swapping the content of one layer to another
+
+##### destroy()
+Destroy layer
 
 ---
 
@@ -171,9 +185,14 @@ Ply.effects["background-out"] = {
 
 
 ## Ply.defaults
- * layer`:Object` — `{}`
- * overlay`:Object` — `{ opacity: 0.6, backgroundColor: 'rgb(0, 0, 0)' }`
- * flags`:Object` — `{ bodyScroll: false, closeByEsc: true, closeByOverlay: true }`
+ * layer`:Object` — css
+ * overlay`:Object` — style overlay
+  * opacity:Number — default `0.6`
+  * backgroundColor:String — default `rgb(0, 0, 0)'`
+ * flags`:Object`
+  * bodyScroll:Boolean — disable scrollbars, default `false`
+  * closeByEsc`:Boolean` — closing the layer by pressing the `esc` key, default `true`
+  * closeByOverlay`:Boolean` — closing the layer by clicking on the overlay, default `true`
 
 
 ---

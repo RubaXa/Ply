@@ -352,7 +352,7 @@
 								interactive = false;
 							});
 
-							callback(layer);
+							callback(rootLayer);
 						});
 					}
 				;

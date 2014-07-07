@@ -341,3 +341,10 @@ Ply.dialog("subscribe", {
 	"email": "trash@rubaxa.org",
 });
 ```
+
+---
+
+
+## Development
+ * `grunt watch` — dev mode
+ * `grunt build` — assembly project

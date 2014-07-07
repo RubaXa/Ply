@@ -103,7 +103,6 @@
 	function _promise(executor) {
 		/* istanbul ignore if */
 		if (Promise) {
-			// @todo: Поткрыть тестами
 			return new Promise(executor);
 		} else {
 			var dfd = $.Deferred();
@@ -559,7 +558,7 @@
 
 
 	/**
-	 * Создать лаер с контентом
+	 * Создать слой с контентом
 	 * @param   {HTMLElement} contentEl
 	 * @param   {Object}      options
 	 * @returns {HTMLElement}
@@ -608,13 +607,14 @@
 		return _buildDOM({
 			ply: ':overlay',
 			tag: '.ply-overlay',
-			css: _extend({
+			css: {
 				top: 0,
 				left: 0,
 				right: 0,
 				bottom: 0,
 				position: 'fixed'
-			}, style)
+			},
+			children: [{ tag: 'div', css: _extend({ width: '100%', height: '100%' }, style) }]
 		});
 	}
 
@@ -629,12 +629,13 @@
 	 */
 	function _createPly(target, options, onlyLayer) {
 		// Корневой слой
-		target.wrapEl = _buildDOM({ css: { whiteSpace: 'nowrap' } });
+		target.wrapEl = _buildDOM({ css: { whiteSpace: 'nowrap', zIndex: options.zIndex } });
 
 
 		// Затемнение
 		if (!onlyLayer) {
 			target.overlayEl = _createOverlay(options.overlay);
+			target.overlayBoxEl = target.overlayEl.firstChild;
 			_appendChild(target.wrapEl, target.overlayEl);
 		}
 
@@ -698,8 +699,10 @@
 	//
 	//       Настройки по умолчанию
 	//
-	var defaults = {
-		layer: {},
+	var _defaults = {
+		zIndex: 10000,
+
+		layer: {}, // css
 
 		overlay: {
 			opacity: .6,
@@ -710,7 +713,9 @@
 			closeBtn: true,
 			bodyScroll: false,
 			closeByEsc: true,
-			closeByOverlay: true
+			closeByOverlay: true,
+			hideLayerInStack: true,
+			visibleOverlayInStack: false
 		},
 
 		baseHtml: true,
@@ -735,21 +740,30 @@
 
 	/**
 	 * @class   Ply
-	 * @param   {Object}   options   опции слоя
+	 * @param   {HTMLElement|Object}   el  слой или опции
+	 * @param   {Object}               [options]   опции слоя
 	 */
-	function Ply(options) {
+	function Ply(el, options) {
+		options = (el instanceof Object) ? el : (options || {});
+		options.el = options.el || el;
+
+
 		var _this = this;
 
 		// Локальный идентификатор
 		_this.cid = 'c' + gid++;
 
 
+		// Увеличиваем глобальный zIndex
+		_defaults.zIndex++;
+
+
 		// Опции
-		_this.options = options = _extend({}, defaults, options);
+		_this.options = options = _extend({}, _defaults, options);
 
 
 		// Флаги
-		options.flags = _extend({}, defaults.flags, options.flags);
+		options.flags = _extend({}, _defaults.flags, options.flags);
 
 
 		// Создаем Ply-элементы
@@ -869,11 +883,16 @@
 		 * @param   {String}         name
 		 * @param   {String|Object}  [effects]
 		 * @returns {Promise}
-		 * @private
 		 */
-		_applyEffect: function (el, name, effects) {
+		applyEffect: function (el, name, effects) {
+			if (!el.nodeType) {
+				effects = name;
+				name = el;
+				el = this.layerEl;
+			}
+
 			effects = Ply.effects.get(effects || this.effects);
-			return Ply.effects.apply.call(effects, el, name);
+			return Ply.effects.apply.call(effects, this[el] || el, name);
 		},
 
 
@@ -973,9 +992,10 @@
 		 * @returns {Promise}
 		 * @private
 		 */
-		toggleState: function (state, effect) {
+		_toggleState: function (state, effect) {
 			var _this = this,
-				mode = state ? 'open' : 'close'
+				mode = state ? 'open' : 'close',
+				prevLayer = Ply.stack.last
 			;
 
 			/* istanbul ignore else */
@@ -989,18 +1009,38 @@
 				// Очередь эффектов
 				_this.fx(() => {
 					return _preloadImage(_this.wrapEl).then(() => {
+						var isFirst = Ply.stack.length === (state ? 1 : 0),
+							hideLayer = prevLayer && prevLayer.hasFlag('hideLayerInStack'),
+							hasOverlay = isFirst || _this.hasFlag('visibleOverlayInStack');
+
 						if (state) {
+							// Убрать «затемнение» если мы не первые в стеке
+							!hasOverlay && _removeElement(_this.overlayBoxEl);
+
 							_appendChild(_this.bodyEl, _this.wrapEl);
 							_this.wrapEl.focus();
 							_autoFocus(_this.layerEl);
+
+							if (hideLayer) {
+								// Скрыть слой «под»
+								prevLayer.applyEffect('close.layer', effect).then(() => {
+									_removeElement(prevLayer.layerEl);
+								});
+							}
+						} else if (prevLayer = Ply.stack.last) {
+							// Слой мог быть скрыт, нужно вернуть его
+							_appendChild(prevLayer.wrapEl, prevLayer.layerEl);
+							prevLayer.hasFlag('hideLayerInStack') && prevLayer.applyEffect('open.layer', effect);
 						}
 
+						// Применяем основные эффекты
 						return _promiseAll([
-							_this._applyEffect(_this.overlayEl, mode + '.overlay', effect),
-							_this._applyEffect(_this.layerEl, mode + '.layer', effect)
+							_this.applyEffect(mode + '.layer', effect),
+							hasOverlay && _this.applyEffect('overlayEl', mode + '.overlay', effect)
 						]).then(() => {
 							if (!state) {
 								_removeElement(_this.wrapEl);
+								_appendChild(_this.overlayEl, _this.overlayBoxEl);
 							}
 							_this.options[mode](_this);
 						});
@@ -1018,7 +1058,7 @@
 		 * @returns {Promise}
 		 */
 		open: function (effect) {
-			return this.toggleState(true, effect);
+			return this._toggleState(true, effect);
 		},
 
 
@@ -1028,7 +1068,7 @@
 		 * @returns {Promise}
 		 */
 		close: function (effect) {
-			return this.toggleState(false, effect);
+			return this._toggleState(false, effect);
 		},
 
 
@@ -1050,8 +1090,8 @@
 						prepare();
 
 						return _promiseAll([
-							_this._applyEffect(closeEl, 'close.layer', effects),
-							_this._applyEffect(openEl, 'open.layer', effects)
+							_this.applyEffect(closeEl, 'close.layer', effects),
+							_this.applyEffect(openEl, 'open.layer', effects)
 						]).then(() => {
 							_removeElement(closeEl);
 							complete();
@@ -1127,7 +1167,7 @@
 
 
 		/**
-		 * Уничтожить лаер
+		 * Уничтожить слой
 		 */
 		destroy: function () {
 			_removeElement(this.wrapEl);
@@ -1159,7 +1199,7 @@
 
 
 		/**
-		 * Удаить последний ply-лаер из стека
+		 * Удаить последний ply-слой из стека
 		 * @param  {Event}  evt
 		 * @private
 		 */
@@ -1392,9 +1432,12 @@
 						// Возвращаем стили, именно на "then" с разрывом, т.к. «Обещания» могу быть ассинхронными
 						el.setAttribute('style', oldStyle[0]);
 						firstEl && firstEl.setAttribute('style', oldStyle[1]);
+						return el;
 					}));
 				}
 			}
+
+			return _promise((resolve) => { resolve(); });
 		},
 
 
@@ -1609,7 +1652,7 @@
 	Ply.each = _each;
 	Ply.extend = _extend;
 	Ply.promise = _promise;
-	Ply.defaults = defaults;
+	Ply.defaults = _defaults;
 	Ply.attrName = _plyAttr;
 	Ply.Context = Context;
 

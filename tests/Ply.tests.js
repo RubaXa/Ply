@@ -29,7 +29,7 @@
 		layer = new Ply();
 
 		for (var key in Ply.defaults.overlay) {
-			equal(layer.overlayEl.style[key], Ply.defaults.overlay[key], key);
+			equal(layer.overlayBoxEl.style[key], Ply.defaults.overlay[key], key);
 		}
 		equal(layer.bodyEl, document.body, 'body');
 
@@ -39,17 +39,17 @@
 
 		// Overlay 1
 		layer = new Ply({ overlay: { opacity: 1 } });
-		equal(layer.overlayEl.style.opacity, 1, 'opacity: 1');
-		equal(layer.overlayEl.style.backgroundColor, "", 'backgroundColor: ""');
+		equal(layer.overlayBoxEl.style.opacity, 1, 'opacity: 1');
+		equal(layer.overlayBoxEl.style.backgroundColor, "", 'backgroundColor: ""');
 
 		// Overlay 2
 		layer = new Ply({ overlay: { opacity: 1, backgroundColor: 'rgb(255, 0, 0)' } });
-		equal(layer.overlayEl.style.opacity, 1, 'opacity: 1');
-		equal(layer.overlayEl.style.backgroundColor, 'rgb(255, 0, 0)', 'backgroundColor: red');
+		equal(layer.overlayBoxEl.style.opacity, 1, 'opacity: 1');
+		equal(layer.overlayBoxEl.style.backgroundColor, 'rgb(255, 0, 0)', 'backgroundColor: red');
 
 		// Overlay 3
 		layer = new Ply({ overlay: null });
-		notEqual(layer.overlayEl.style.position, 'fixed', 'overlay: null');
+		notEqual(layer.overlayBoxEl.style.position, 'fixed', 'overlay: null');
 
 		// Layer
 		layer = new Ply({ layer: { textAlign: 'center' } });
@@ -75,7 +75,10 @@
 		var content = document.createElement('b');
 		content.innerHTML = '<b>!</b>';
 
-		equal(new Ply({ }).contentEl.innerHTML, '', 'conentEl');
+		equal(new Ply('').contentEl.innerHTML, '', 'conentEl');
+		equal(new Ply('Wow!').contentEl.innerHTML, 'Wow!', 'contentEl');
+		equal(new Ply(content).contentEl.innerHTML, '<b>!</b>');
+
 		equal(new Ply({ el: 'Wow!'  }).contentEl.innerHTML, 'Wow!', 'contentEl');
 		equal(new Ply({ el: content }).contentEl.innerHTML, '<b>!</b>');
 	});
@@ -223,11 +226,11 @@
 			simulateEvent(layer.contentEl.getElementsByTagName('em')[1], 'click');
 
 			equal(log.join('\n'), [
-				'layer:DIV.click->layer',
+				'layer:DIV.click->:layer',
 				'foo:I.click->foo',
 				'bar:B.click->bar',
 				'bar:B.click->bar',
-				'layer:DIV.click->layer'
+				'layer:DIV.click->:layer'
 			].join('\n'));
 
 			return layer.close();

@@ -314,6 +314,7 @@
 				var first = options.initState,
 					current,
 					rootLayer,
+					interactive,
 					stack = name,
 					dialogs = {},
 
@@ -332,7 +333,8 @@
 						// Клонирование данных
 						var data = JSON.parse(JSON.stringify(spec.data));
 
-						current = spec;
+						current = spec; // текущий диалог
+						interactive = true; // идет анимация
 						(spec.prepare || noop)(data, dialogs);
 
 						Ply.create(spec.ui || 'alert', spec.options || {}, data).then((layer) => {
@@ -341,12 +343,13 @@
 							if (rootLayer) {
 								promise = rootLayer[/^inner/.test(effect) ? 'innerSwap' : 'swap'](layer, effect);
 							} else {
-								promise = layer.open();
 								rootLayer = layer;
+								promise = rootLayer.open();
 							}
 
 							promise.then(() => {
 								dialogs[spec.$name].el = rootLayer.layerEl;
+								interactive = false;
 							});
 
 							callback(layer);
@@ -371,9 +374,15 @@
 
 					//noinspection FunctionWithInconsistentReturnsJS
 					rootLayer.options.callback = (ui) => {
+						if (interactive) {
+							return false;
+						}
+
 						var isNext = ui.state || (current.back === 'next'),
-							swap = isNext ? stack[current.next] : stack[current.back]
+							swap = stack[current[isNext ? 'next' : 'back']]
 						;
+
+//						console.log(current.$name, stack[current[isNext ? 'next' : 'back']]);
 
 						if (swap) {
 							changeLayer(swap, current[isNext ? 'nextEffect' : 'backEffect'], (layer) => {

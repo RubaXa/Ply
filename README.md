@@ -6,7 +6,7 @@ Amazing layer/modal/dialog system. Wow!
 ## Features
  * Support browsers Chrome 20+, FireFox 20+, Safari 6+, Opera 12+, IE8+ (in progress)
  * [ES6 syntax](https://github.com/termi/es6-transpiler)
- * No jQuery (but then need polyfill [Promise](https://gist.github.com/RubaXa/8501359) polyfill)
+ * No jQuery (but then need [Promise](https://gist.github.com/RubaXa/8501359) polyfill)
  * More than 90% [test code coverage](http://rubaxa.github.io/Ply/tests/)
  * Preloading content before displaying
  * Smart focus on form elements

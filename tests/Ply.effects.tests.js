@@ -186,7 +186,7 @@
 		var log = { open: [], close: [] },
 			type = 'open',
 			pid, i,
-			layer = new Ply({ effect: 'fade' })
+			layer = new Ply('fade', { effect: 'fade' })
 		;
 
 		pid = setInterval(function () {
@@ -195,22 +195,26 @@
 
 		return layer.open().then(function () {
 			type = 'close';
+			ok(layer.layerEl.offsetHeight > 0, '> 0');
 			return layer.close();
 		}).then(function () {
-			ok(log.open.length > 2, 'open');
-			ok(log.close.length > 2, 'close');
+			ok(layer.layerEl.offsetHeight == 0, '== 0');
+			if (Ply.support.transition) {
+				ok(log.open.length > 2, 'open');
+				ok(log.close.length > 2, 'close');
 
-			for (i = 1; i < log.open.length; i++) {
-				if (log.open[i] < log.open[i-1]) {
-					equal(log.open, null, 'open: ' + i);
-					break;
+				for (i = 1; i < log.open.length; i++) {
+					if (log.open[i] < log.open[i-1]) {
+						equal(log.open, null, 'open: ' + i);
+						break;
+					}
 				}
-			}
 
-			for (i = 1; i < log.close.length; i++) {
-				if (log.close[i] > log.close[i-1]) {
-					equal(log.close, null, 'close: ' + i);
-					break;
+				for (i = 1; i < log.close.length; i++) {
+					if (log.close[i] > log.close[i-1]) {
+						equal(log.close, null, 'close: ' + i);
+						break;
+					}
 				}
 			}
 
@@ -226,7 +230,7 @@
 
 		Ply.each('scale fall slide 3d-flip 3d-sign'.split(' '), function (name) {
 			queue = queue.then(function () {
-				return new Ply({ effect: name + ':50' }).open().then(function (layer) {
+				return new Ply(name, { effect: name + ':50' }).open().then(function (layer) {
 					return layer.close();
 				});
 			});

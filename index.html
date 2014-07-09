@@ -97,6 +97,10 @@
 
 	<div style="height: 100px"></div>
 
+	<script>
+		// Polyfills
+		![].forEach && document.writeln('<script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/3.4.0/es5-shim.min.js"><' + '/script>')
+	</script>
 
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
@@ -119,17 +123,24 @@
 					var $el = $(this);
 					var $code = $el.closest('.row').find('code');
 					var code = $code.text().split('\n');
-					var offset = code[1].match(/^\s+/)[0].length;
+					var offset = ((code[1] || code[0]).match(/^[\s\t]+/) || [''])[0].length;
 
 					$.each(code, function (i) {
 						code[i] = code[i].substr(offset);
 					});
 
-					code = code.slice(1).join('\n');
-					$code.text(code);
-					$el.data('code', code);
+					code = code.slice(+(code.length > 1)).join('\n');
 
-					hljs.highlightBlock($code.wrap('<pre/>').parent().addClass('javascript')[0])
+					$el.data('code', code);
+					var $codeEl = $('<pre class="javascript"/>')
+						.insertBefore($code)
+						.append('<code>' + code + '</code>')
+					;
+					$code.remove();
+
+					try {
+						hljs.highlightBlock($codeEl[0]);
+					} catch (err) {}
 				})
 				.on('click', function () {
 					Function($(this).data('code'))();
@@ -243,21 +254,23 @@
 		(function () {
 			function setNoiseBackground(el, color, width, height, opacity) {
 				var canvas = document.createElement("canvas");
-				var context = canvas.getContext("2d");
+				if (canvas.getContext) {
+					var context = canvas.getContext("2d");
 
-				canvas.width = width;
-				canvas.height = height;
+					canvas.width = width;
+					canvas.height = height;
 
-				for (var i = 0; i < width; i++) {
-					for (var j = 0; j < height; j++) {
-						var val = Math.floor(Math.random() * 255);
-						context.fillStyle = "rgba(" + val + "," + val + "," + val + "," + opacity + ")";
-						context.fillRect(i, j, 1, 1);
+					for (var i = 0; i < width; i++) {
+						for (var j = 0; j < height; j++) {
+							var val = Math.floor(Math.random() * 255);
+							context.fillStyle = "rgba(" + val + "," + val + "," + val + "," + opacity + ")";
+							context.fillRect(i, j, 1, 1);
+						}
 					}
-				}
 
-				el.style.backgroundColor = color;
-				el.style.backgroundImage = "url(" + canvas.toDataURL("image/png") + ")";
+					el.style.backgroundColor = color;
+					el.style.backgroundImage = "url(" + canvas.toDataURL("image/png") + ")";
+				}
 			}
 
 			// Usage

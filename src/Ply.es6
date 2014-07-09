@@ -403,7 +403,9 @@
 					_css(el, spec.css);
 				}
 				else if (name === 'text') {
-					(value != null) && _appendChild(el, document.createTextNode(value));
+					try {
+						(value != null) && _appendChild(el, document.createTextNode(value));
+					} catch (e) {}
 				}
 				else if (name === 'html') {
 					(value != null) && (el.innerHTML = value);
@@ -413,7 +415,11 @@
 					el.setAttribute(_plyAttr, value);
 				}
 				else if (name in el) {
-					el[name] = value;
+					try {
+						el[name] = value;
+					} catch (e) {
+						el.setAttribute(name, value);
+					}
 				}
 				else if (/^data-/.test(name)) {
 					el.setAttribute(name, value);
@@ -629,7 +635,10 @@
 	 */
 	function _createPly(target, options, onlyLayer) {
 		// Корневой слой
-		target.wrapEl = _buildDOM({ css: { whiteSpace: 'nowrap', zIndex: options.zIndex } });
+		target.wrapEl = _buildDOM({
+			tag: 'form',
+			css: { whiteSpace: 'nowrap', zIndex: options.zIndex }
+		});
 
 
 		// Затемнение
@@ -678,7 +687,6 @@
 			overflow: 'auto',
 			outline: 0
 		});
-
 
 		return target;
 	}
@@ -793,7 +801,7 @@
 		// Подписываемся кнопку «отмена» и «крестик»
 		_this.on('click', ':close', (evt, el) => {
 			evt.preventDefault();
-			_this.closeBy(el.nodeName === 'BUTTON' ? 'cancel' : 'x');
+			_this.closeBy(el.type === 'reset' ? 'cancel' : 'x');
 		});
 
 
@@ -885,6 +893,8 @@
 		 * @returns {Promise}
 		 */
 		applyEffect: function (el, name, effects) {
+			el = this[el] || el;
+
 			if (!el.nodeType) {
 				effects = name;
 				name = el;
@@ -892,7 +902,7 @@
 			}
 
 			effects = Ply.effects.get(effects || this.effects);
-			return Ply.effects.apply.call(effects, this[el] || el, name);
+			return Ply.effects.apply.call(effects, el, name);
 		},
 
 
@@ -1172,8 +1182,10 @@
 		destroy: function () {
 			_removeElement(this.wrapEl);
 
-			this.visible = false;
 			this._deactivate();
+			Ply.stack.remove(this);
+
+			this.visible = false;
 			this.options.destroy(this);
 		}
 	};
@@ -1236,7 +1248,7 @@
 			var idx = this._idx[layer.cid];
 
 			if (idx >= 0) {
-				array_splice.call(this, idx);
+				array_splice.call(this, idx, 1);
 
 				delete this._idx[layer.cid];
 				this.last = this[this.length-1];
@@ -1652,6 +1664,7 @@
 	Ply.each = _each;
 	Ply.extend = _extend;
 	Ply.promise = _promise;
+	Ply.support = support;
 	Ply.defaults = _defaults;
 	Ply.attrName = _plyAttr;
 	Ply.Context = Context;

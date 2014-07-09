@@ -77,8 +77,7 @@
 				else {
 					options.clientX = options.x;
 					options.clientY = options.y;
-					var evt = document.createEventObject();
-					oEvent = $.extend(evt, options);
+					oEvent = $.extend(document.createEventObject(), options);
 					element.fireEvent('on' + eventName, oEvent);
 				}
 				return element;
@@ -94,6 +93,19 @@
 						start();
 					});
 				});
+			};
+
+			function _htmlNormalize(html) {
+				if (typeof html === 'string') {
+					html =  html.replace(/<\/?\w+/g, function (match) {
+						return match.toLowerCase();
+					});
+				}
+				return html;
+			}
+
+			window.equalHtml = function (actual, expected, message) {
+				equal(_htmlNormalize(actual), _htmlNormalize(expected), message);
 			};
 		})();
 	</script>

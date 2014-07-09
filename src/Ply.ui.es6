@@ -70,7 +70,7 @@
 	 * @param {Boolean}  [simpleMode]
 	 */
 	ui.factory = function (name, renderer, simpleMode) {
-		ui[name.trim().replace(/\s+/g, ' ')] = function (data, path) {
+		ui[name.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')] = function (data, path) {
 			var fragment = document.createDocumentFragment();
 
 			if ((data != null) || name === ':root') {
@@ -112,7 +112,7 @@
 	// Ply-слой - корневой элемент
 	ui.factory(':root', function (data) {
 		return {
-			tag: 'form.ply-form',
+			tag: '.ply-form',
 			className: data.mod,
 			children: [
 				ui(':header', data.header),

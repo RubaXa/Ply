@@ -7,13 +7,18 @@
 		expected.tagName = (expected.tagName || 'div').toUpperCase();
 
 		Ply.each(expected, function (value, attr) {
-			equal(actual[attr] || actual.getAttribute(attr), value, msg + '.' + attr);
+			var attrVal = actual[attr] || actual.getAttribute(attr);
+			if (attr === 'innerHTML') {
+				attrVal = attrVal.toLowerCase();
+			}
+			equal(attrVal, value, msg + '.' + attr);
 		});
 	}
 
 
 	test('build()', function () {
 		elementEqual(Ply.dom.build(), { });
+		ok(!Ply.dom.build().parentNode, 'parent');
 	});
 
 
@@ -69,7 +74,7 @@
 				},
 				'hr': true,
 				'br': false,
-				'button': 'Enter'
+				'button': 'enter'
 			}
 		});
 
@@ -78,7 +83,7 @@
 		elementEqual(el, { tagName: 'form' });
 		elementEqual(el.childNodes[0], { tagName: 'input', type: 'password' });
 		elementEqual(el.childNodes[1], { tagName: 'hr' });
-		elementEqual(el.childNodes[2], { tagName: 'button', innerHTML: 'Enter' });
+		elementEqual(el.childNodes[2], { tagName: 'button', innerHTML: 'enter' });
 	});
 
 
@@ -93,7 +98,7 @@
 				},
 				{ tag: 'hr', skip: true },
 				false && { tag: bar },
-				{ tag: 'button', text: "Enter" }
+				{ tag: 'button', text: "enter" }
 			]
 		});
 
@@ -101,7 +106,7 @@
 
 		elementEqual(el, { tagName: 'form' });
 		elementEqual(el.childNodes[0], { tagName: 'input', type: 'checkbox', disabled: true });
-		elementEqual(el.childNodes[1], { tagName: 'button', innerHTML: 'Enter' });
+		elementEqual(el.childNodes[1], { tagName: 'button', innerHTML: 'enter' });
 	});
 	
 

@@ -17,7 +17,7 @@
 	promiseTest('dialog("alert")', function () {
 		setTimeout(function () {
 			var el = Ply.stack.last.wrapEl;
-			simulateEvent(el.getElementsByTagName('button')[0], 'click');
+			el.getElementsByTagName('button')[0].click();
 		}, 50);
 
 		return Ply.dialog('alert', { effect: 'none:1' }, 'msg').then(function (ui) {
@@ -30,7 +30,7 @@
 	promiseTest('dialog("confirm")', function () {
 		setTimeout(function () {
 			var el = Ply.stack.last.wrapEl;
-			simulateEvent(el.getElementsByTagName('button')[1], 'click');
+			el.getElementsByTagName('button')[1].click();
 		}, 50);
 
 		return Ply.dialog('confirm', { effect: 'none:1' }, {
@@ -47,7 +47,7 @@
 		setTimeout(function () {
 			var el = Ply.stack.last.wrapEl;
 			Ply.stack.last.context.val('email', 'xx@yy.zz');
-			simulateEvent(el.getElementsByTagName('button')[0], 'click');
+			el.getElementsByTagName('button')[0].click();
 		}, 50);
 
 		return Ply.dialog('prompt', { effect: 'none:1' }, {
@@ -64,7 +64,7 @@
 	promiseTest('dialog("confirm") with YES/NO', function () {
 		setTimeout(function () {
 			var el = Ply.stack.last.wrapEl;
-			simulateEvent(el.getElementsByTagName('button')[0], 'click');
+			el.getElementsByTagName('button')[0].click();
 		}, 50);
 
 		return Ply.dialog("confirm", { effect: 'none:1' }, { ok: 'YES', cancel: 'NO' }).then(function (ui) {
@@ -99,10 +99,8 @@
 				log.push(ui.name + ':' + ui.state);
 
 				setTimeout(function () {
-					simulateEvent(
-						ui.layer.layerEl.getElementsByTagName('button')[1]
-						|| ui.layer.layerEl.getElementsByTagName('button')[0],
-						'click');
+					var el = ui.layer.layerEl;
+					(el.getElementsByTagName('button')[1] || el.getElementsByTagName('button')[0]).click();
 				}, 10);
 			}
 		}).then(function () {

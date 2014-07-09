@@ -3,6 +3,12 @@
 
 	var layer;
 
+
+	function hasParent(el) {
+		return !!(el && el.parentNode && el.parentNode.nodeType !== 11);
+	}
+
+
 	test('core', function () {
 		equal(typeof Ply, 'function');
 		ok(new Ply instanceof Ply);
@@ -21,7 +27,7 @@
 
 	function checkVisiblity(layer, state, msg) {
 		equal(!!layer.visible, state, '[' + msg + '] visible: ' + state);
-		equal(!!layer.wrapEl.parentNode, state, msg + ' -> parentNode is ' + (state ? '' : 'not') + 'exists');
+		equal(hasParent(layer.wrapEl.parentNode), state, msg + ' -> parentNode is ' + (state ? '' : 'not ') + 'exists');
 	}
 
 
@@ -29,7 +35,9 @@
 		layer = new Ply();
 
 		for (var key in Ply.defaults.overlay) {
-			equal(layer.overlayBoxEl.style[key], Ply.defaults.overlay[key], key);
+			var val = layer.overlayBoxEl.style[key] + '';
+			val = val.replace(/,\s*/g, ', ');
+			equal(val, Ply.defaults.overlay[key], key);
 		}
 		equal(layer.bodyEl, document.body, 'body');
 
@@ -45,7 +53,7 @@
 		// Overlay 2
 		layer = new Ply({ overlay: { opacity: 1, backgroundColor: 'rgb(255, 0, 0)' } });
 		equal(layer.overlayBoxEl.style.opacity, 1, 'opacity: 1');
-		equal(layer.overlayBoxEl.style.backgroundColor, 'rgb(255, 0, 0)', 'backgroundColor: red');
+		equal(layer.overlayBoxEl.style.backgroundColor.replace(/,\s*/g, ', '), 'rgb(255, 0, 0)', 'backgroundColor: red');
 
 		// Overlay 3
 		layer = new Ply({ overlay: null });
@@ -75,31 +83,32 @@
 		var content = document.createElement('b');
 		content.innerHTML = '<b>!</b>';
 
-		equal(new Ply('').contentEl.innerHTML, '', 'conentEl');
-		equal(new Ply('Wow!').contentEl.innerHTML, 'Wow!', 'contentEl');
-		equal(new Ply(content).contentEl.innerHTML, '<b>!</b>');
+		equalHtml(new Ply('').contentEl.innerHTML, '', 'conentEl');
+		equalHtml(new Ply('Wow!').contentEl.innerHTML, 'Wow!', 'contentEl');
+		equalHtml(new Ply(content).contentEl.innerHTML, '<b>!</b>');
 
-		equal(new Ply({ el: 'Wow!'  }).contentEl.innerHTML, 'Wow!', 'contentEl');
-		equal(new Ply({ el: content }).contentEl.innerHTML, '<b>!</b>');
+		equalHtml(new Ply({ el: 'Wow!'  }).contentEl.innerHTML, 'Wow!', 'contentEl');
+		equalHtml(new Ply({ el: content }).contentEl.innerHTML, '<b>!</b>');
 	});
 
 
-	promiseTest('open/close', function () {
+	promiseTest('open-close', function () {
 		layer = new Ply({ el: 'Wow!' });
 
-		ok(!layer.wrapEl.parentNode, '!parent - open');
+		ok(!hasParent(layer.wrapEl), '!parent - open');
 		ok(!layer.visible, 'visible: false');
 
 		return layer.open().then(function () {
 			var ratio = layer.wrapEl.offsetHeight / (layer.layerEl.offsetTop + layer.layerEl.offsetHeight/2);
 
+			ok(hasParent(layer.wrapEl), 'parent - open');
 			ok(layer.visible, 'visible: true');
 			ok(layer.wrapEl.offsetWidth > 0, 'offsetWidth > 0');
 			ok(Math.abs(2 - ratio) < 0.1, ratio, 'delat(' + ratio + ') < 0.1');
 
 			layer.close().then(function () {
 				ok(!layer.visible, 'visible: false - close');
-				ok(!layer.wrapEl.parentNode, '!parent - close');
+				ok(!hasParent(layer.wrapEl), '!parent - close');
 			});
 		});
 	});
@@ -107,7 +116,7 @@
 
 	promiseTest('closeByEsc', function () {
 		function open(msg, esc) {
-			var layer = new Ply({ flags: { closeByEsc: esc }, effect: { duration: 1 } });
+			var layer = new Ply({ el: msg, flags: { closeByEsc: esc }, effect: { duration: 1 } });
 
 			checkVisiblity(layer, false, msg);
 
@@ -142,23 +151,23 @@
 
 
 	promiseTest('closeByOverlay', function () {
-		function test(msg, state, callback) {
-			var layer = new Ply({ flags: { closeByOverlay: state }, effect: { duration: 1 } });
+		function testMe(msg, state, callback) {
+			var layer = new Ply({ el: msg, flags: { closeByOverlay: state }, effect: { duration: 1 } });
 			return layer.open().then(function () {
 				checkVisiblity(layer, true, msg);
 				simulateEvent(layer.overlayEl, 'click');
 
-				return sleep(function () {
-					callback(layer, msg);
-				}, 50);
+				return sleep($.noop, 50).then(function () {
+					return callback(layer, msg);
+				});
 			});
 		}
 
 
-		return test('closeByOverlay: true', true, function (layer, msg) {
+		return testMe('closeByOverlay: true', true, function (layer, msg) {
 			checkVisiblity(layer, false, msg);
 
-			return test('closeByOverlay: false', false, function (layer, msg) {
+			return testMe('closeByOverlay: false', false, function (layer, msg) {
 				checkVisiblity(layer, true, msg);
 				return layer.close();
 			});
@@ -181,7 +190,7 @@
 	});
 
 
-	promiseTest('destory', function () {
+	promiseTest('destroy', function () {
 		return new Ply({ effect: 'none:1' }).open().then(function (layer) {
 			checkVisiblity(layer, true, '#1');
 
@@ -192,18 +201,20 @@
 	});
 
 
-	promiseTest('on/off', function () {
+	promiseTest('on-off', function () {
 		var log = [],
+
 			logMe = function (prefix, evt, el) {
 				log.push(prefix + ':' + el.tagName + '.' + evt.type + '->' + el.getAttribute('data-ply'));
 			},
+
 			barHandle = function (evt, el) {
 				log.pop();
 				logMe('bar', evt, el);
 			}
 		;
 
-		return new Ply({ el: '<i data-ply="foo"><em>foo</em></i><b data-ply="bar"><em>bar</em></b>' }).open().then(function (layer) {
+		return new Ply('<i data-ply="foo"><em>foo</em></i><b data-ply="bar"><em>bar</em></b>').open().then(function (layer) {
 			layer.on('click', function (evt, el) {
 				logMe('layer', evt, el);
 			});
@@ -225,13 +236,27 @@
 
 			simulateEvent(layer.contentEl.getElementsByTagName('em')[1], 'click');
 
-			equal(log.join('\n'), [
+			var tmp, expected = [
 				'layer:DIV.click->:layer',
 				'foo:I.click->foo',
 				'bar:B.click->bar',
 				'bar:B.click->bar',
 				'layer:DIV.click->:layer'
-			].join('\n'));
+			];
+
+			tmp = expected.slice();
+			$.each(log, function (i, entry) {
+				i = $.inArray(entry, tmp);
+				ok(i > -1, 'log.'+entry);
+				tmp.splice(i, 1);
+			});
+
+			tmp = log.slice();
+			$.each(expected, function (i, entry) {
+				i = $.inArray(entry, tmp);
+				ok(i > -1, 'expected.'+entry);
+				tmp.splice(i, 1);
+			});
 
 			return layer.close();
 		});

@@ -142,7 +142,7 @@
 	ui.factory('ok', function (data) {
 		return {
 			ply: ':ok',
-			tag: 'button.ply-ok',
+			tag: 'button.ply-ctrl.ply-ok',
 			text: data === true ? _lang.ok : data
 		};
 	});
@@ -152,7 +152,7 @@
 	ui.factory('cancel', function (data) {
 		return {
 			ply: ':close',
-			tag: 'button.ply-cancel',
+			tag: 'button.ply-ctrl.ply-cancel',
 			type: 'reset',
 			text: data === true ? _lang.cancel : data
 		};

@@ -253,10 +253,9 @@
 	 * @private
 	 */
 	function _appendChild(parent, el) {
-		/* istanbul ignore else */
-		if (parent && el) {
-			parent.appendChild(el);
-		}
+		try {
+			parent && el && parent.appendChild(el);
+		} catch (e) {}
 	}
 
 
@@ -423,9 +422,7 @@
 					_css(el, spec.css);
 				}
 				else if (name === 'text') {
-					try {
-						(value != null) && _appendChild(el, document.createTextNode(value));
-					} catch (e) {}
+					(value != null) && _appendChild(el, document.createTextNode(value));
 				}
 				else if (name === 'html') {
 					(value != null) && (el.innerHTML = value);
@@ -821,7 +818,7 @@
 		// Подписываемся кнопку «отмена» и «крестик»
 		_this.on('click', ':close', (evt, el) => {
 			evt.preventDefault();
-			_this.closeBy(el.type === 'reset' ? 'cancel' : 'x');
+			_this.closeBy(el.nodeName === 'BUTTON' ? 'cancel' : 'x');
 		});
 
 

@@ -91,10 +91,10 @@
 
 .ply-footer {
 }
-	.ply-footer button {
+	.ply-footer .ply-ctrl {
 		margin-left: 20px;
 	}
-	.ply-footer button:first-child {
+	.ply-footer .ply-ctrl:first-child {
 		margin-left: 0;
 	}
 

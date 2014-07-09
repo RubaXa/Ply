@@ -39,7 +39,7 @@
 		support = (() => {
 			var props = {},
 				style = _buildDOM().style,
-				names = 'transition transform perspective transformStyle transformOrigin backfaceVisibility'.split(' '),
+				names = 'opacity transition transform perspective transformStyle transformOrigin backfaceVisibility'.split(' '),
 				prefix = ['Webkit', 'Moz', 'O', 'MS']
 			;
 
@@ -71,12 +71,30 @@
 		},
 
 
+		/**
+		 * Хуки для css
+		 * @type {Object}
+		 */
+		_cssHooks = {
+		},
+
 		array_core = [],
 		array_push = array_core.push,
 		array_splice = array_core.splice,
 
 		_plyAttr = 'data-ply'
 	;
+
+
+	//
+	//           Определяем css-хуки
+	//
+	if (!support.opacity) {
+		_cssHooks.opacity = function (style, value) {
+			style.zoom = 1;
+			style.filter = 'alpha(opacity=' + (value * 100) + ')';
+		};
+	}
 
 
 	//
@@ -345,6 +363,8 @@
 				}
 
 				return prop === void 0 ? val : val[prop];
+			} else if (_cssHooks[prop]) {
+				_cssHooks[prop](el.style, val);
 			} else {
 				el.style[support[prop] || prop] = val;
 			}
@@ -1659,6 +1679,8 @@
 	};
 
 	Ply.css = _css;
+	Ply.cssHooks = _cssHooks;
+
 	Ply.keys = keys;
 	Ply.noop = noop;
 	Ply.each = _each;

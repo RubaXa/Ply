@@ -1376,8 +1376,10 @@
 				options.open.args = openFx.args[0];
 				options.close.args = closeFx.args[0];
 			}
+			else if (!(options instanceof Object)) {
+				options = {};
+			}
 
-			options = options || {};
 			options.duration = (options.duration || defaults.duration) | 0;
 
 			for (var key in {open: 0, close: 0}) {

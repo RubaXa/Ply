@@ -839,7 +839,10 @@
 		_activate: function () {
 			if (!this.hasFlag('bodyScroll')) {
 				var bodyEl = this.bodyEl,
-					dummyEl = _buildDOM()
+					dummyEl = _buildDOM({
+						css: { overflow: 'scroll', visibility: 'hidden' },
+						children: [{ tag: 'div' }]
+					})
 				;
 
 				// @todo: Покрыть тестами
@@ -850,7 +853,7 @@
 				_appendChild(bodyEl, dummyEl);
 				_css(bodyEl, {
 					overflow: 'hidden',
-					paddingRight: bodyEl.offsetWidth - dummyEl.offsetWidth + 'px'
+					paddingRight: (dummyEl.offsetWidth - dummyEl.firstChild.offsetWidth) + 'px'
 				});
 				_removeElement(dummyEl);
 			}

@@ -4,7 +4,7 @@ Amazing layer/modal/dialog system. Wow!
 
 
 ## Features
- * Support browsers #1: Chrome 20+, FireFox 20+, Safari 6+, Opera 12+, IE8+
+ * Support browsers: Chrome 20+, FireFox 20+, Safari 6+, Opera 12+, IE8+
  * No jQuery (but then need [Promise](https://gist.github.com/RubaXa/8501359) polyfill)
  * More than 90% [test code coverage](http://rubaxa.github.io/Ply/tests/)
  * Preloading content before displaying
@@ -201,9 +201,12 @@ Ply.effects["background-out"] = {
   * opacity:Number — default `0.6`
   * backgroundColor:String — default `rgb(0, 0, 0)'`
  * flags:`Object`
+  * closeBtn:`Boolean` — presence close button "✖"
   * bodyScroll:Boolean — disable scrollbars, default `false`
   * closeByEsc:`Boolean` — closing the layer by pressing the `esc` key, default `true`
   * closeByOverlay:`Boolean` — closing the layer by clicking on the overlay, default `true`
+  * hideLayerInStack:`Boolean` — hide the layer if it is not the first in the stack
+  * visibleOverlayInStack:`Boolean` — visibility overlay, if the layer is not the first in the stack
 
 
 ---

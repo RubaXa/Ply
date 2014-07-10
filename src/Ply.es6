@@ -82,7 +82,9 @@
 		array_push = array_core.push,
 		array_splice = array_core.splice,
 
-		_plyAttr = 'data-ply'
+		_plyAttr = 'data-ply',
+
+		_resolvedPromise = _promise((resolve) => resolve())
 	;
 
 
@@ -806,7 +808,7 @@
 				return _this;
 			}));
 		};
-		_this.fx.queue = _promise((resolve) => { resolve(); });
+		_this.fx.queue = _resolvedPromise;
 
 
 		// Клик по затемнению
@@ -1471,7 +1473,7 @@
 				}
 			}
 
-			return _promise((resolve) => { resolve(); });
+			return _resolvedPromise;
 		},
 
 

@@ -4,7 +4,7 @@ Amazing layer/modal/dialog system. Wow!
 
 
 ## Features
- * Support browsers Chrome 20+, FireFox 20+, Safari 6+, Opera 12+, IE8+ (#1: in progress)
+ * Support browsers #1: Chrome 20+, FireFox 20+, Safari 6+, Opera 12+, IE8+
  * No jQuery (but then need [Promise](https://gist.github.com/RubaXa/8501359) polyfill)
  * More than 90% [test code coverage](http://rubaxa.github.io/Ply/tests/)
  * Preloading content before displaying

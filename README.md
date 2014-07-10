@@ -357,3 +357,13 @@ Ply.dialog("subscribe", {
 ## Development
  * `grunt watch` — dev mode
  * `grunt build` — assembly project
+
+
+---
+
+
+## Changelog
+
+##### 0.3.0
+ * #1: Testing and documentation
+ * #3: Stack features

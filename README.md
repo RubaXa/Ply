@@ -4,12 +4,12 @@ Amazing layer/modal/dialog system. Wow!
 
 
 ## Features
- * Support browsers Chrome 20+, FireFox 20+, Safari 6+, Opera 12+, IE8+ (in progress)
- * [ES6 syntax](https://github.com/termi/es6-transpiler)
+ * Support browsers Chrome 20+, FireFox 20+, Safari 6+, Opera 12+, IE8+ (#1: in progress)
  * No jQuery (but then need [Promise](https://gist.github.com/RubaXa/8501359) polyfill)
  * More than 90% [test code coverage](http://rubaxa.github.io/Ply/tests/)
  * Preloading content before displaying
  * Smart focus on form elements
+ * [ES6 syntax](https://github.com/termi/es6-transpiler)
 
 
 
@@ -17,7 +17,7 @@ Amazing layer/modal/dialog system. Wow!
 
 Include [ply.css](ply.css) in `<head/>` (optional)
 ```html
-	<link href='./ply.css' rel='stylesheet' type='text/css'/>
+<link href="./ply.css" rel="stylesheet" type="text/css"/>
 ```
 
 Create a dialog:

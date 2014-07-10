@@ -91,7 +91,9 @@ var ply = new Ply({
 		closeBtn: true, // presence close button "✖"
 		bodyScroll: false, // disable scrollbar at body
 		closeByEsc: true, // close by press on `Esc` key
-		closeByOverlay: true // close by click on the overlay
+		closeByOverlay: true, // close by click on the overlay
+		hideLayerInStack: true, // hide the layer if it is not the first in the stack
+		visibleOverlayInStack: false // visibility overlay, if the layer is not the first in the stack
 	},
 
 	// Callback

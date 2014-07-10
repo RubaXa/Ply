@@ -152,3 +152,24 @@ pre code {
   line-height: 1.5;
   padding: 30px;
 }
+
+
+
+#rubaxa-repos a,
+#rubaxa-repos li {
+	color: #fff;
+	font-size: 16px;
+	text-shadow: 0 1px 1px rgba(0,0,0,.35);
+	font-family: Arial, Geneva, sans-serif;
+	font-weight: normal;
+}
+
+#rubaxa-repos a {
+	font-size: 20px;
+	text-decoration: none;
+	border-bottom: 1px solid rgba(255,255,255,.3);
+	transition: all .3s;
+}
+	#rubaxa-repos a:hover {
+		border-bottom: 1px solid rgba(255,255,255,1);
+	}

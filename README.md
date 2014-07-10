@@ -65,6 +65,15 @@ Ply.dialog({
 
 ## Low-level
 
+##### new Ply(el[, options])
+ * el:`String|HTMLElement` — content of layer
+ * options:`Object` — layer options
+
+
+##### new Ply(options)
+ * options:`Object` — layer options
+
+
 ```js
 var ply = new Ply({
 	el: "...", // HTML-content
@@ -102,14 +111,14 @@ ply.open().then(function () {
 });
 ```
 
-##### open([effect])`:Promise`
+##### open([effect]):`Promise`
 
-##### close(effect)`:Promise`
+##### close(effect):`Promise`
 
-##### swap(layer[, effect])`:Promise`
+##### swap(layer[, effect]):`Promise`
 Swapping one layer to another
 
-##### innerSwap(layer[, effect])`:Promise`
+##### innerSwap(layer[, effect]):`Promise`
 Swapping the content of one layer to another
 
 ##### destroy()
@@ -156,27 +165,27 @@ Ply.effects["background-out"] = {
 
 
 ## Ply.stack
- * last`:Ply|null`
- * length`:Number`
+ * last:`Ply|null`
+ * length:`Number`
 
 
 ---
 
 
 ## Ply.support
- * transition`:String|Boolean`
- * transform`:String|Boolean`
- * perspective`:String|Boolean`
- * transformStyle`:String|Boolean`
- * transformOrigin`:String|Boolean`
- * backfaceVisibility`:String|Boolean`
+ * transition:`String|Boolean`
+ * transform:`String|Boolean`
+ * perspective:`String|Boolean`
+ * transformStyle:`String|Boolean`
+ * transformOrigin:`String|Boolean`
+ * backfaceVisibility:`String|Boolean`
 
 
 ---
 
 
 ## Ply.lang (localization)
- * ok`:String` — "OK"
+ * ok:`String` — "OK"
  * cancel:`String` — "Cancel"
  * cross:`String` — "✖"
 
@@ -185,14 +194,14 @@ Ply.effects["background-out"] = {
 
 
 ## Ply.defaults
- * layer`:Object` — css
- * overlay`:Object` — style overlay
+ * layer:`Object` — css
+ * overlay:`Object` — style overlay
   * opacity:Number — default `0.6`
   * backgroundColor:String — default `rgb(0, 0, 0)'`
- * flags`:Object`
+ * flags:`Object`
   * bodyScroll:Boolean — disable scrollbars, default `false`
-  * closeByEsc`:Boolean` — closing the layer by pressing the `esc` key, default `true`
-  * closeByOverlay`:Boolean` — closing the layer by clicking on the overlay, default `true`
+  * closeByEsc:`Boolean` — closing the layer by pressing the `esc` key, default `true`
+  * closeByOverlay:`Boolean` — closing the layer by clicking on the overlay, default `true`
 
 
 ---
@@ -200,7 +209,7 @@ Ply.effects["background-out"] = {
 
 ## Ply.dom
 
-##### build(tag`:String|Object`)`:HTMLElement`
+##### build(tag:`String|Object`):`HTMLElement`
 ```js
 Ply.build(); // <div/>
 Ply.build("input"); // <input/>
@@ -216,13 +225,13 @@ Ply.build({ text: "<i>?</i>" }); // <div>&lt;i&gt;?&lt;/i&gt;</div>
 Ply.build({ html: "<i>!</i>" }); // <div><i>!</i></div>
 ```
 
-##### append(parent`:HTMLElement`, el`:HTMLElement`)
+##### append(parent:`HTMLElement`, el:`HTMLElement`)
 
-##### remove(el`:HTMLElement`)
+##### remove(el:`HTMLElement`)
 
-##### addEvent(el`:HTMLElement`, name`:String`, fn`:Function`)
+##### addEvent(el:`HTMLElement`, name:`String`, fn:`Function`)
 
-##### removeEvent(el`:HTMLElement`, name`:String`, fn`:Function`)
+##### removeEvent(el:`HTMLElement`, name:`String`, fn:`Function`)
 
 
 
@@ -232,8 +241,8 @@ Ply.build({ html: "<i>!</i>" }); // <div><i>!</i></div>
 ## Create a dialog template
 
 
-##### Ply.ui(name)`:HTMLElement`
- * name`:String` — ui-element name
+##### Ply.ui(name):`HTMLElement`
+ * name:`String` — ui-element name
 
 ```js
 var el = Ply.ui("btn", {
@@ -244,13 +253,13 @@ var el = Ply.ui("btn", {
 
 
 ##### Ply.ui.factory(name, factory)
- * name`:String` — ui-element name
- * factory`:Function` — callback
+ * name:`String` — ui-element name
+ * factory:`Function` — callback
 
 ```js
 Ply.ui.factory("btn", function (data, children) {
-	// data`:Object`
-	// children`:HTMLElement`
+	// data:`Object`
+	// children:`HTMLElement`
 
 	return {
 		"tag": ".btn",
@@ -273,8 +282,8 @@ Ply.ui.factory("btn", function (data, children) {
 
 
 ##### Ply.factory(name, factory)
- * name`:String` — template name
- * factory`:Function` — callback
+ * name:`String` — template name
+ * factory:`Function` — callback
 
 ```js
 Ply.factory("subscribe", function (options, data, resolve) {

@@ -101,7 +101,7 @@
 				setTimeout(function () {
 					var el = ui.layer.layerEl;
 					(el.getElementsByTagName('button')[1] || el.getElementsByTagName('button')[0]).click();
-				}, 10);
+				}, 50);
 			}
 		}).then(function () {
 			equal(log.join('\n'), [

@@ -216,7 +216,7 @@
 				: { el: data.text || data },
 			ctrls: {
 				ok: data.ok || defaults.ok,
-				cancel: data.cancel || defaults.cancel
+				cancel: data.cancel === false ? null : (data.cancel || defaults.cancel)
 			}
 		};
 	}
@@ -405,7 +405,9 @@
 
 			return Ply.open(name, options, data).then((layer) => {
 				return _promise((resolve) => {
-					layer.options.callback = resolve;
+					layer.options.close = () => {
+						resolve(layer.result);
+					};
 				});
 			});
 		}

@@ -7,12 +7,12 @@
 /*global define, window */
 ((factory) => {
 	window['Ply'] = factory(window);
-})((window) => {
+})((window, Deferred) => {
 	'use strict';
 
 
 	var gid = 1,
-		noop = (() => {}),
+		noop = () => {},
 
 		document = window.document,
 		setTimeout = window.setTimeout,
@@ -22,7 +22,7 @@
 				|| /* istanbul ignore next */ window.ender
 				|| /* istanbul ignore next */ window.$,
 
-		Promise = window.Promise,
+		Promise = Deferred || window.Promise,
 
 
 		/**
@@ -82,9 +82,7 @@
 		array_push = array_core.push,
 		array_splice = array_core.splice,
 
-		_plyAttr = 'data-ply',
-
-		_resolvedPromise = _promise((resolve) => resolve())
+		_plyAttr = 'data-ply'
 	;
 
 
@@ -139,7 +137,6 @@
 	 * @private
 	 */
 	function _promiseAll(iterable) {
-		// @todo: Поткрыть тестами `Promise.all`
 		return Promise
 			? /* istanbul ignore next */ Promise.all(iterable)
 			: $.when.apply($, iterable);
@@ -147,16 +144,26 @@
 
 
 	/**
-	 * Выполнить действие в следующем тике
-	 * @param   {Function}  fn
-	 * @returns {Function}
+	 * Вернуть разрешенное «Обещание»
+	 * @param   {*} [value]
+	 * @returns {Promise}
 	 * @private
 	 */
-	function _nextTick(fn) {
-		return () => {
-			setTimeout(fn, 1);
-		};
+	function _resolvePromise(value) {
+		return _promise((resolve) => resolve(value));
 	}
+
+
+	/**
+	 * Привести значение к «Обещанию»
+	 * @param   {*} value
+	 * @returns {Promise}
+	 * @private
+	 */
+	function _cast(value) {
+		return value && value.then ? value : _resolvePromise(value);
+	}
+
 
 
 	/**
@@ -808,7 +815,7 @@
 				return _this;
 			}));
 		};
-		_this.fx.queue = _resolvedPromise;
+		_this.fx.queue = _resolvePromise();
 
 
 		// Клик по затемнению
@@ -839,8 +846,8 @@
 			if (!this.hasFlag('bodyScroll')) {
 				var bodyEl = this.bodyEl,
 					dummyEl = _buildDOM({
-						css: { overflow: 'scroll', visibility: 'hidden' },
-						children: [{ tag: 'div' }]
+						css: { overflow: 'auto', visibility: 'hidden', height: '5px' },
+						children: [{ tag: 'div', css: { height: '100px' } }]
 					})
 				;
 
@@ -933,16 +940,22 @@
 		 * @param  {String}  name  прчина закрытия
 		 */
 		closeBy: function (name) {
-			var result = this.options.callback({
-				by: name,
-				state: name === 'submit',
-				layer: this,
-				context: this.context
-			});
+			var ui = {
+					by: name,
+					state: name === 'submit',
+					layer: this,
+					data: this.context.toJSON(),
+					context: this.context
+				},
+				result = this.options.callback(ui)
+			;
 
-			if (result !== false) {
-				this.close();
-			}
+			_cast(result).then((result) => {
+				if (result !== false) {
+					this.result = ui;
+					this.close();
+				}
+			});
 		},
 
 
@@ -1062,7 +1075,9 @@
 						} else if (prevLayer = Ply.stack.last) {
 							// Слой мог быть скрыт, нужно вернуть его
 							_appendChild(prevLayer.wrapEl, prevLayer.layerEl);
-							prevLayer.hasFlag('hideLayerInStack') && prevLayer.applyEffect('open.layer', effect);
+							prevLayer.hasFlag('hideLayerInStack') && prevLayer.applyEffect('open.layer', effect).then(() => {
+								_autoFocus(prevLayer.el); // todo: нужен метод layer.autoFocus();
+							});
 						}
 
 						// Применяем основные эффекты
@@ -1074,6 +1089,7 @@
 								_removeElement(_this.wrapEl);
 								_appendChild(_this.overlayEl, _this.overlayBoxEl);
 							}
+							// «Событие» open или close
 							_this.options[mode](_this);
 						});
 					});
@@ -1090,6 +1106,7 @@
 		 * @returns {Promise}
 		 */
 		open: function (effect) {
+			this.result = null;
 			return this._toggleState(true, effect);
 		},
 
@@ -1423,7 +1440,7 @@
 			;
 
 
-			if (effects && (effect = effects[name[1]]) && (fx = Ply.effects[effect.name])) { // layer/overlay
+			if (support.transition && effects && (effect = effects[name[1]]) && (fx = Ply.effects[effect.name])) {
 				if (fx['to'] || fx['from']) {
 					// Клонируем
 					fx = _deepClone(fx);
@@ -1463,17 +1480,15 @@
 						}
 
 						// Ждем завершения анимации
-						setTimeout(resolve, support.transition && effect.duration);
-					}).then(_nextTick(() => {
-						// Возвращаем стили, именно на "then" с разрывом, т.к. «Обещания» могу быть ассинхронными
+						setTimeout(resolve, effect.duration);
+					}).then(() => {
 						el.setAttribute('style', oldStyle[0]);
 						firstEl && firstEl.setAttribute('style', oldStyle[1]);
-						return el;
-					}));
+					});
 				}
 			}
 
-			return _resolvedPromise;
+			return _resolvePromise();
 		},
 
 
@@ -1625,6 +1640,10 @@
 	 * @param  {HTMLElement}  el
 	 */
 	function Context(el) {
+		/**
+		 * Корневой элемент
+		 * @type {HTMLElement}
+		 */
 		this.el = el;
 	}
 
@@ -1639,12 +1658,7 @@
 		 */
 		getEl: function (name) {
 			if (this.el) {
-				var items = _getElementsByTagName(this.el, '*'), i = items.length;
-				while (i--) {
-					if (items[i].getAttribute(_plyAttr + '-name') === name) {
-						return items[i];
-					}
-				}
+				return _querySelector('[' + _plyAttr + '-name="' + name + '"]', this.el);
 			}
 		},
 
@@ -1656,7 +1670,7 @@
 		 * @returns {String}
 		 */
 		val: function (name, value) {
-			var el = this.getEl(name);
+			var el = typeof name === 'string' ? this.getEl(name) : name;
 
 			if (el && (el.value == null)) {
 				el = _getElementsByTagName(el, 'input')[0]
@@ -1670,6 +1684,24 @@
 			}
 
 			return el && el.value || "";
+		},
+
+
+		/**
+		 * Получить JSON
+		 * @returns {Object}
+		 */
+		toJSON: function () {
+			var items = this.el.querySelectorAll('[' + _plyAttr + '-name]'),
+				json = {},
+				el,
+				i = items.length
+			;
+			while (i--) {
+				el = items[i];
+				json[el.getAttribute(_plyAttr + '-name')] = this.val(el);
+			}
+			return json;
 		}
 	};
 

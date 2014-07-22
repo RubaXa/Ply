@@ -23,8 +23,19 @@ Include [ply.css](ply.css) in `<head/>` (optional)
 Create a dialog:
 ```js
 Ply.dialog("alert", "Wow!").then(function (ui) {
-	ui.by; // submit, overlay, esc, "x"
 	ui.state; // true — "OK", false — "cancel"
+	ui.by; // submit, overlay, esc, "x"
+});
+
+//or
+Ply.dialog("confirm", "Do you like it?").then(function (ui) {
+	if (ui.state) {
+		// Clicked "OK"
+	}
+	else {
+		// Clicked "Cancel"
+		//   details: `ui.by` — "cancel", "overlay", "esc", "x"
+	}
 });
 ```
 
@@ -54,7 +65,12 @@ Ply.dialog({
 		backEffect: "3d-flip[-180,180]"
 	}
 }).then(function (ui) {
-	// ...
+	if (ui.state) {
+		// OK
+	} else {
+		// Cancel
+		// ui.by — 'overlay', 'x', 'esc'
+	}
 })
 ```
 

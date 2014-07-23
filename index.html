@@ -27,6 +27,7 @@
 
 	<h1 title="Try demo!"><u>Ply</u></h1>
 
+
 	<div class="container">
 		<div class="row">
 			<h2>Alert</h2>
@@ -41,9 +42,9 @@
 			</div>
 
 			<div class="col-right">
-				<code>
+				<pre class="javascript"><code>
 					Ply.dialog("alert", "Hello %username%!");
-				</code>
+				</code></pre>
 			</div>
 		</div>
 
@@ -60,13 +61,13 @@
 			</div>
 
 			<div class="col-right">
-				<code>
+				<pre class="javascript"><code>
 					Ply.dialog(
 						"confirm",
 						{ effect: "3d-sign" },
 						"Continue?"
 					);
-				</code>
+				</code></pre>
 			</div>
 		</div>
 
@@ -86,15 +87,59 @@
 			</div>
 
 			<div class="col-right">
-				<code>
+				<pre class="javascript"><code>
 					Ply.dialog("prompt", {
 						title: "Spam subscribe",
 						form: { email: "E-mail" }
 					});
-				</code>
+				</code></pre>
 			</div>
 		</div>
 
+		<br/>
+
+		<div class="row">
+			<h2>Dialogs / Multistep</h2>
+
+			<div class="col-left">
+				<div class="ply-layer confirm example">
+					<div class="ply-inside">
+						<div class="ply-content">You want to win?</div>
+						<div class="ply-footer"><button class="ply-ctrl ply-ok">Yes</button><button class="ply-ctrl ply-cancel">No</button></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-right">
+				<pre class="javascript"><code>
+					Ply.dialog({
+						"intro": {
+							ui: "confirm",
+							data: {
+								text: "You want to win?",
+								ok: "Yes",
+								cancel: "No"
+							},
+							next: "congratulations",
+							nextEffect: "3d-flip[180,-180]"
+						},
+						"congratulations": {
+							data: {
+								children: [{
+									tag: "img",
+									src: "st/you-win.gif"
+								}],
+								ok: "Okay"
+							}
+						}
+					});
+				</code></pre>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="container">
 		<div class="row">
 			<div style="margin-top: 80px;">
 				<div id="rubaxa-repos">Loading&hellip;</div>
@@ -124,7 +169,7 @@
 	</script>
 
 	<script>
-		jQuery(function ($) {
+		(function ($) {
 			hljs.configure({ classPrefix: '' });
 
 			$('.example')
@@ -138,17 +183,13 @@
 						code[i] = code[i].substr(offset);
 					});
 
-					code = code.slice(+(code.length > 1)).join('\n');
+					code = code.slice(+(code.length > 1)).join('\n').replace(/\t/g, '  ');
 
 					$el.data('code', code);
-					var $codeEl = $('<pre class="javascript"/>')
-						.insertBefore($code)
-						.append('<code>' + code + '</code>')
-					;
-					$code.remove();
+					$code.html(code);
 
 					try {
-						hljs.highlightBlock($codeEl[0]);
+						hljs.highlightBlock($code.parent()[0]);
 					} catch (err) {}
 				})
 				.on('click', function () {
@@ -255,7 +296,7 @@
 					}
 				});
 			});
-		});
+		})(jQuery);
 	</script>
 
 

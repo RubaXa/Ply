@@ -46,6 +46,7 @@ h2 {
 
 .row {
 	margin-bottom: 30px;
+	clear: both;
 }
 	.row:after {
 		clear: both;
@@ -151,6 +152,8 @@ pre code {
   font-family: Menlo, Monaco, Consolas, monospace;
   line-height: 1.5;
   padding: 30px;
+  overflow: scroll;
+  max-height: 220px;
 }
 
 

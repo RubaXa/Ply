@@ -6,19 +6,20 @@ module.exports = function (grunt){
 
 		es6transpiler: {
 			core: {
-				src: 'src/Ply.es6',
+				src: 'Ply.es6',
 				dest: 'Ply.js'
-			},
-			ui: {
-				src: 'src/Ply.ui.es6',
-				dest: 'Ply.ui.js'
 			}
+		},
+
+		export: {
+			src: "src/Ply.es6",
+			dst: "Ply.es6"
 		},
 
 		watch: {
 			scripts: {
 				files: 'src/*.es6',
-				tasks: ['es6transpiler'],
+				tasks: ['es'],
 				options: { interrupt: true }
 			}
 		},
@@ -46,11 +47,43 @@ module.exports = function (grunt){
 			},
 			dist: {
 				files: {
-					  '<%= pkg.exportName %>.min.js': ['Ply.js', 'Ply.ui.js']
+					  '<%= pkg.exportName %>.min.js': ['Ply.js']
 				}
 			}
 		}
 	});
+
+
+
+	grunt.registerTask('export', 'Export es6 to js', function () {
+		function file(rel, name) {
+			return rel.split('/').slice(0, -1).concat(name).join('/') + '.es6';
+		}
+
+		function parse(src, pad) {
+			grunt.log.writeln((pad || '') + 'Parse file:', src);
+
+			return grunt.file.read(src)
+				.replace(/module\.exports\s*=\s*([\s\S]+);/, '$1')
+				.replace(/require\('(.*?)'\);?/g, function (_, name) {
+					return parse(file(src, name), '  ');
+				})
+				.replace(/\/+\s+&import\s+"(.*?)".*?\n/g, function (_, name) {
+					return parse(file(src, name), '  ');
+				})
+				.trim()
+			;
+		}
+
+		var config = grunt.config(this.name);
+		var content = parse(config.src).replace(/;;;[^\n]+/g, '');
+
+		grunt.log.writeln(new Array(50).join('-'));
+		grunt.log.oklns('Write file:', config.dst);
+
+		grunt.file.write(config.dst, content);
+	});
+
 
 
 	grunt.loadNpmTasks('grunt-contrib-watch');
@@ -59,7 +92,7 @@ module.exports = function (grunt){
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 
 
-	grunt.registerTask('es', ['es6transpiler']);
+	grunt.registerTask('es', ['export', 'es6transpiler']);
 	grunt.registerTask('build', ['es', 'qunit']);
 	grunt.registerTask('min', ['uglify']);
 	grunt.registerTask('default', ['build', 'min']);

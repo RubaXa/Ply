@@ -1,35 +1,23 @@
 /*global define, Ply */
-((factory) => {
-	factory(Ply);
-})((Ply) => {
+;;;(Ply => {
 	'use strict';
 
 
-	var _plyAttr = Ply.attrName,
-		noop = Ply.noop,
-		_each = Ply.each,
-		_extend = Ply.extend,
-		_promise = Ply.promise,
-		_buildDOM = Ply.dom.build,
-		_appendChild = Ply.dom.append,
-		_lang = Ply.lang,
-
-		_toBlock = (block, name) => {
-			if (block == null) {
-				return { skip: true };
-			}
-
-			if (typeof block === 'string') {
-				block = { text: block };
-			}
-
-			if (typeof block === 'object') {
-				block.name = block.name || name;
-			}
-
-			return block;
+	function _toBlock(block, name) {
+		if (block == null) {
+			return { skip: true };
 		}
-	;
+
+		if (typeof block === 'string') {
+			block = { text: block };
+		}
+
+		if (typeof block === 'object') {
+			block.name = block.name || name;
+		}
+
+		return block;
+	}
 
 
 
@@ -143,7 +131,7 @@
 		return {
 			ply: ':ok',
 			tag: 'button.ply-ctrl.ply-ok',
-			text: data === true ? _lang.ok : data
+			text: data === true ? lang.ok : data
 		};
 	});
 
@@ -154,7 +142,7 @@
 			ply: ':close',
 			tag: 'button.ply-ctrl.ply-cancel',
 			type: 'reset',
-			text: data === true ? _lang.cancel : data
+			text: data === true ? lang.cancel : data
 		};
 	});
 
@@ -417,4 +405,4 @@
 	// Export
 	Ply.ui = ui;
 	Ply.factory = factory;
-});
+;;;})();

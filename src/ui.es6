@@ -1,3 +1,7 @@
+/**
+ * @desc Диалоги
+ */
+
 /*global define, Ply */
 ;;;(Ply => {
 	'use strict';

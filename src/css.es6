@@ -1,3 +1,7 @@
+/**
+ * @desc Функция для работы с style
+ */
+
 /*global support, document*/
 
 

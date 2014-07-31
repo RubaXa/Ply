@@ -1,3 +1,7 @@
+/**
+ * @desc Работы со стеком
+ */
+
 var array_core = [],
 	array_push = array_core.push,
 	array_splice = array_core.splice

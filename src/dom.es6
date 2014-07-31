@@ -1,6 +1,6 @@
-//
-//        Работа с DOM
-//
+/**
+ * @desc Работа с DOM
+ */
 
 
 var $ = require('jquery');

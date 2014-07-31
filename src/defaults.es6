@@ -1,3 +1,7 @@
+/**
+ * @desc Найтроки по умолчанию
+ */
+
 module.exports = {
 	zIndex: 10000,
 

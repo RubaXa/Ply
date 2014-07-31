@@ -1,3 +1,8 @@
+/**
+ * @desc Что поддерживает браузер
+ */
+
+
 /*global _buildDOM*/
 module.exports = (() => {
 	var props = {},

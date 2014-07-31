@@ -6,16 +6,24 @@
 
 /*global require, define, window */
 ((factory) => {
-	window['Ply'] = factory(window);
-})((window, Deferred) => {
+	'use strict';
+
+	if( typeof define === 'function' && define.amd ){
+		define(factory);
+	}
+	else {
+		window['Ply'] = factory();
+	}
+})(() => {
 	'use strict';
 
 
 	var gid = 1,
 		noop = () => {},
 
-		document = window.document,
-		setTimeout = window.setTimeout,
+		env = window,
+		document = env.document,
+		setTimeout = env.setTimeout,
 
 		lang = require('lang'),
 		support = require('support'),
@@ -38,8 +46,9 @@
 
 
 	//
-	//       Утилиты, CSS, DOM
+	//       Обещания, Утилиты, CSS, DOM
 	//
+	require('promise');
 	require('utils');
 	require('dom');
 	require('css');

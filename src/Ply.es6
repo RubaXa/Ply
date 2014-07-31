@@ -738,6 +738,7 @@
 	Ply.each = _each;
 	Ply.extend = _extend;
 	Ply.promise = _promise;
+	Ply.Promise = Promise;
 	Ply.support = support;
 	Ply.defaults = _defaults;
 	Ply.attrName = _plyAttr;

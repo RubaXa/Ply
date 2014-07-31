@@ -2,8 +2,9 @@
  * @desc «Обещания»
  */
 
-
-var Promise = window.Deferred || window.Promise;
+var NativePromise = window.Promise,
+	Promise = window.Deferred || NativePromise
+;
 
 
 /**
@@ -44,7 +45,7 @@ function _promiseAll(iterable) {
  * @private
  */
 function _resolvePromise(value) {
-	return _promise((resolve) => resolve(value));
+	return _promise(resolve => resolve(value));
 }
 
 
@@ -61,11 +62,35 @@ function _cast(value) {
 
 
 //
-// Проверяем поддержку метода always
+// Проверяем поддержку методы: done, fail, always
 //
-if (!_resolvePromise().always) {
+var __promise__ = _resolvePromise();
+
+if (NativePromise && !__promise__.always) {
+	Promise = function (executor) {
+		var promise = new NativePromise(executor);
+		promise.__proto__ = this.__proto__;
+		return promise;
+	};
+
+	Promise.prototype = Object.create(NativePromise.prototype, { constructor: { value: Promise } });
+
+	Promise.prototype.done = function (callback) {
+		this.then(callback);
+		return this;
+	};
+
+	Promise.prototype.fail = function (callback) {
+		this['catch'](callback);
+		return this;
+	};
+
 	Promise.prototype.always = function (callback) {
 		this.then(callback, callback);
 		return this;
 	};
+
+	['all', 'cast', 'reject', 'resolve'].forEach(name => {
+		Promise[name] = NativePromise[name];
+	});
 }

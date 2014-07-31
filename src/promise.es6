@@ -6,7 +6,6 @@
 var Promise = window.Deferred || window.Promise;
 
 
-
 /**
  * Создать «Обещание»
  * @param   {Function}  executor
@@ -59,3 +58,14 @@ function _cast(value) {
 	return value && value.then ? value : _resolvePromise(value);
 }
 
+
+
+//
+// Проверяем поддержку метода always
+//
+if (!_resolvePromise().always) {
+	Promise.prototype.always = function (callback) {
+		this.then(callback, callback);
+		return this;
+	};
+}

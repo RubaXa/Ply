@@ -3,9 +3,6 @@
  */
 
 
-var $ = require('jquery');
-
-
 /**
  * Разбор строки "tag#id.foo.bar"
  * @const {RegExp}

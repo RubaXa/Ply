@@ -4,8 +4,8 @@
  * Обязательно нужен JSON и Promise
  */
 
-/*global require, define, window */
-((factory) => {
+/*global require, define, window*/
+(factory => {
 	'use strict';
 
 	if( typeof define === 'function' && define.amd ){
@@ -37,6 +37,13 @@
 
 		_plyAttr = 'data-ply'
 	;
+
+
+	//
+	// $-like object
+	//
+	var $ = require('jquery');
+
 
 
 	//

@@ -2,14 +2,15 @@
 	module('Ply.ui');
 
 
-	promiseTest('dialog("unknown")', function () {
+	asyncTest('dialog("unknown")', function () {
 		setTimeout(function () {
 			simulateEvent(Ply.stack.last.overlayEl, 'click');
 		}, 50);
 
-		return Ply.dialog('unknown').then(function (ui) {
+		Ply.dialog('unknown').always(function (ui) {
 			equal(ui.by, 'overlay', 'ui.by');
 			equal(ui.state, false, 'ui.state');
+			start();
 		});
 	});
 
@@ -27,18 +28,19 @@
 	});
 
 
-	promiseTest('dialog("confirm")', function () {
+	asyncTest('dialog("confirm")', function () {
 		setTimeout(function () {
 			var el = Ply.stack.last.wrapEl;
 			el.getElementsByTagName('button')[1].click();
 		}, 50);
 
-		return Ply.dialog('confirm', { effect: 'none:1' }, {
+		Ply.dialog('confirm', { effect: 'none:1' }, {
 			title: "???",
 			text: "!!!"
-		}).then(function (ui) {
+		}).always(function (ui) {
 			equal(ui.by, 'cancel', 'ui.by');
 			equal(ui.state, false, 'ui.state');
+			start();
 		});
 	});
 

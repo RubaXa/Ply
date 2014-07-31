@@ -2,7 +2,7 @@
  * @desc Диалоги
  */
 
-/*global define, Ply */
+/*global Ply */
 ;;;(Ply => {
 	'use strict';
 
@@ -396,9 +396,9 @@
 			}
 
 			return Ply.open(name, options, data).then((layer) => {
-				return _promise((resolve) => {
+				return _promise((resolve, reject) => {
 					layer.options.close = () => {
-						resolve(layer.result);
+						(layer.result.state ? resolve : reject)(layer.result);
 					};
 				});
 			});

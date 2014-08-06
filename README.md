@@ -2,8 +2,8 @@
 Amazing layer/modal/dialog system. Wow!
 
 
-
 ## Features
+ * Demo: [http://rubaxa.github.io/Ply/](http://rubaxa.github.io/Ply/)
  * Support browsers: Chrome 20+, FireFox 20+, Safari 6+, Opera 12+, IE8+
  * No jQuery (but then need [Promise](https://gist.github.com/RubaXa/8501359) polyfill)
  * More than 90% [test code coverage](http://rubaxa.github.io/Ply/tests/)
@@ -22,21 +22,28 @@ Include [ply.css](ply.css) in `<head/>` (optional)
 
 Create a dialog:
 ```js
-Ply.dialog("alert", "Wow!").then(function (ui) {
+Ply.dialog("alert", "Wow!").always(function (ui) {
 	ui.state; // true — "OK", false — "cancel"
 	ui.by; // submit, overlay, esc, "x"
 });
 
 //or
-Ply.dialog("confirm", "Do you like it?").then(function (ui) {
-	if (ui.state) {
-		// Clicked "OK"
-	}
-	else {
-		// Clicked "Cancel"
-		//   details: `ui.by` — "cancel", "overlay", "esc", "x"
-	}
-});
+Ply.dialog("confirm", "Do you like it?")
+	.done(function (ui) {
+		// OK
+	})
+	.fail(function (ui) {
+		// Cancel
+	})
+	.always(function (ui) {
+		if (ui.state) {
+			// Clicked "OK"
+		}
+		else {
+			// Clicked "Cancel"
+			//   details: `ui.by` — "cancel", "overlay", "esc", "x"
+		}
+	});
 ```
 
 
@@ -64,7 +71,7 @@ Ply.dialog({
 		back: "init-state",
 		backEffect: "3d-flip[-180,180]"
 	}
-}).then(function (ui) {
+}).always(function (ui) {
 	if (ui.state) {
 		// OK
 	} else {

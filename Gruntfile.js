@@ -4,6 +4,10 @@ module.exports = function (grunt){
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 
+		version: {
+			src: ['src/Ply.es6']
+		},
+
 		es6transpiler: {
 			core: {
 				src: 'Ply.es6',
@@ -86,6 +90,7 @@ module.exports = function (grunt){
 
 
 
+	grunt.loadNpmTasks('grunt-version');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-qunit-istanbul');
 	grunt.loadNpmTasks('grunt-es6-transpiler');
@@ -95,5 +100,5 @@ module.exports = function (grunt){
 	grunt.registerTask('es', ['export', 'es6transpiler']);
 	grunt.registerTask('build', ['es', 'qunit']);
 	grunt.registerTask('min', ['uglify']);
-	grunt.registerTask('default', ['build', 'min']);
+	grunt.registerTask('default', ['version', 'build', 'min']);
 };

@@ -753,6 +753,7 @@
 	};
 
 
+	Ply.version = '0.4.0';
 
 	return Ply;
 });

@@ -392,6 +392,10 @@ Ply.dialog("subscribe", {
 
 ## Changelog
 
+##### 0.4.0
+ * + 'always' method (using inheritance «Promise»).
+ * + Modularization
+
 ##### 0.3.0
  * #1: Testing and documentation
  * #3: Stack features

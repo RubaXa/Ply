@@ -27,10 +27,9 @@
 
 	<h1 title="Try demo!"><u>Ply</u></h1>
 
-
 	<div class="container">
 		<div class="row">
-			<h2>Alert</h2>
+			<h2><a href="#Alert" name="Alert">Alert</a></h2>
 
 			<div class="col-left">
 				<div class="ply-layer alert example">
@@ -49,7 +48,7 @@
 		</div>
 
 		<div class="row">
-			<h2>Confirm</h2>
+			<h2><a href="#Confirm" name="Confirm">Confirm</a></h2>
 
 			<div class="col-left">
 				<div class="ply-layer confirm example">
@@ -72,7 +71,7 @@
 		</div>
 
 		<div class="row">
-			<h2>Prompt</h2>
+			<h2><a href="#Prompt" name="Prompt">Prompt</a></h2>
 
 			<div class="col-left">
 				<div class="ply-layer prompt example">
@@ -99,7 +98,7 @@
 		<br/>
 
 		<div class="row">
-			<h2>Dialogs / Multistep</h2>
+			<h2><a href="#Dialogs" name="Dialogs">Dialogs / Multistep</a></h2>
 
 			<div class="col-left">
 				<div class="ply-layer confirm example">
@@ -120,8 +119,10 @@
 								ok: "Yes",
 								cancel: "No"
 							},
-							next: "congratulations",
-							nextEffect: "3d-flip[180,-180]"
+							next: "congratulations", // OK button
+							nextEffect: "3d-flip[180,-180]",
+							back: "exit", // Cancel button
+							backEffect: "scale"
 						},
 						"congratulations": {
 							data: {
@@ -131,6 +132,9 @@
 								}],
 								ok: "Okay"
 							}
+						},
+						"exit": {
+							data: "Very vain!"
 						}
 					});
 				</code></pre>
@@ -151,26 +155,30 @@
 
 	<div style="height: 100px"></div>
 
-	<script>
-		// Polyfills
-		![].forEach && document.writeln('<script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/3.4.0/es5-shim.min.js"><' + '/script>')
-	</script>
-
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
 
 	<script>
-		if (/local/.test(location)) {
-			document.write('<script src="./Ply.js"><'+'/script>');
-			document.write('<script src="./Ply.ui.js"><'+'/script>');
-		} else {
-			document.write('<script src="./Ply.min.js"><'+'/script>');
-		}
+		// Boot
+		(function () {
+			var files = [];
+
+			![].forEach && files.push('//cdnjs.cloudflare.com/ajax/libs/es5-shim/3.4.0/es5-shim.min');
+			files.push('//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min');
+
+			if (/local/.test(location)) {
+				files.push('/js/jquery.dev', './Ply' );
+			} else {
+				files.push('//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min', './Ply.min');
+			}
+
+			for (var i = 0; i < files.length; i++) {
+				document.write('<script src="' + files[i] + '.js"></' + 'script>');
+			}
+		})();
 	</script>
 
 	<script>
 		(function ($) {
-			hljs.configure({ classPrefix: '' });
+			window.hljs && hljs.configure({ classPrefix: '' });
 
 			$('.example')
 				.each(function () {
@@ -296,6 +304,20 @@
 					}
 				});
 			});
+
+
+			// Select active example
+			(function _change() {
+				$('body')
+					.find('.selected')
+						.removeClass('selected')
+						.end()
+					.find('[name="' + location.toString().split('#')[1] + '"]')
+						.addClass('selected')
+				;
+
+				$(window).on('hashchange', _change);
+			})();
 		})(jQuery);
 	</script>
 

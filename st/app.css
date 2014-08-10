@@ -38,10 +38,31 @@ h1 {
 		text-decoration: none;
 	}
 
+
 h2 {
+	position: relative;
 	font-size: 30px;
 	margin-bottom: 10px;
 }
+	/* anchors */
+	h2 a {
+		color: #fff;
+		outline: 0;
+		text-decoration: none;
+	}
+		h2 a:before {
+			right: 100%;
+			padding-right: 10px;
+			display: block;
+			content: '→';
+			position: absolute;
+			visibility: hidden;
+		}
+
+		h2 a:hover:before,
+		h2 a.selected:before {
+			visibility: visible;
+		}
 
 
 .row {

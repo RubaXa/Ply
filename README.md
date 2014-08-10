@@ -129,8 +129,8 @@ var ply = new Ply({
 
 
 // And
-ply.open().then(function () {
-	ply.swap({ el: ".." }, "3d-flip").then(function () {
+ply.open().always(function () {
+	ply.swap({ el: ".." }, "3d-flip").always(function () {
 		ply.close();
 	});
 });

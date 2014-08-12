@@ -56,6 +56,7 @@ function _resolvePromise(value) {
  * @private
  */
 function _cast(value) {
+	/* istanbul ignore next */
 	return value && value.then ? value : _resolvePromise(value);
 }
 
@@ -66,6 +67,7 @@ function _cast(value) {
 //
 var __promise__ = _resolvePromise();
 
+/* istanbul ignore next */
 if (NativePromise && !__promise__.always) {
 	Promise = function (executor) {
 		var promise = new NativePromise(executor);
@@ -73,7 +75,14 @@ if (NativePromise && !__promise__.always) {
 		return promise;
 	};
 
-	Promise.prototype = Object.create(NativePromise.prototype, { constructor: { value: Promise } });
+	Promise.prototype = Object.create(NativePromise.prototype);
+	Promise.prototype.constructor = Promise;
+
+	Promise.prototype.then = function (callback) {
+		var promise = NativePromise.prototype.then.call(this, callback);
+		promise.__proto__ = this.__proto__; // for FireFox
+		return promise;
+	};
 
 	Promise.prototype.done = function (callback) {
 		this.then(callback);

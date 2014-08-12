@@ -70,8 +70,8 @@
 		}, 50);
 
 		return Ply.dialog("confirm", { effect: 'none:1' }, { ok: 'YES', cancel: 'NO' }).then(function (ui) {
-			equal(ui.layer.layerEl.getElementsByTagName('button')[0].innerHTML, 'YES', 'ok');
-			equal(ui.layer.layerEl.getElementsByTagName('button')[1].innerHTML, 'NO', 'cancel');
+			equal(ui.widget.layerEl.getElementsByTagName('button')[0].innerHTML, 'YES', 'ok');
+			equal(ui.widget.layerEl.getElementsByTagName('button')[1].innerHTML, 'NO', 'cancel');
 		});
 	});
 
@@ -101,7 +101,7 @@
 				log.push(ui.name + ':' + ui.state);
 
 				setTimeout(function () {
-					var el = ui.layer.layerEl;
+					var el = ui.widget.layerEl;
 					(el.getElementsByTagName('button')[1] || el.getElementsByTagName('button')[0]).click();
 				}, 100);
 			}

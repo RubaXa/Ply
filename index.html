@@ -140,6 +140,81 @@
 				</code></pre>
 			</div>
 		</div>
+
+
+		<div style="text-align: center; padding: 50px 0;">
+			<h2 style="font-size: 40px">&infin; Customization examples &infin;</h2>
+		</div>
+
+
+		<div class="row">
+			<h2><a href="#Login" name="Login">Login</a></h2>
+
+			<div class="col-left">
+				<div class="ply-layer base example">
+					<div class=" ply-inside">
+						<div class=" ply-form ply-ui">
+							<div class=" ply-header ply-ui">Login</div>
+							<div class=" ply-content ply-ui">
+								<div data-ply-name="dialog-form" class=" ply-ui">
+									<input type="text" placeholder="E-mail" class=" ply-input ply-ui"/>
+									<input type="password" placeholder="Password" class=" ply-input ply-ui"/>
+								</div>
+							</div>
+							<div class=" ply-footer ply-ui">
+								<button class=" ply-ctrl ply-ok ply-ui">Enter</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-right">
+				<pre class="javascript"><code>
+					// Usage: ply@rubaxa.org / 123
+					// ply/login.dialog.js
+					Ply.factory('login', function (options, data, resolve) {
+						options.flags = {
+							closeBtn: false,
+							closeByEsc: true,
+							closeByOverlay: true,
+							visibleOverlayInStack: true
+						};
+
+						options.onaction = function (ui) {
+							var data = ui.data;
+							return !ui.state || $.post('/api/login', data).fail(function () {
+								$(ui.widget.el)
+									.addClass('ply-invalid')
+									.on('input', function () {
+										$(this).removeClass('ply-invalid')
+									})
+								;
+							});
+						};
+
+						// Use base factory
+						Ply.factory.use('base', options, {
+							title: 'Login',
+							form: {
+								email: 'E-mail',
+								password: { hint: 'Password', type: 'password' }
+							},
+							ok: 'Enter',
+							cancel: false
+						}, resolve);
+					});
+
+
+					// app.js
+					Ply.dialog('login').done(function (ui) {
+						Ply.dialog('alert', 'Bingo!');
+					});
+				</code></pre>
+			</div>
+		</div>
+
+
 	</div>
 
 
@@ -170,6 +245,8 @@
 				files.push('//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min', './Ply.min');
 			}
 
+			files.push('//cdnjs.cloudflare.com/ajax/libs/jquery-mockjax/1.5.3/jquery.mockjax');
+
 			for (var i = 0; i < files.length; i++) {
 				document.write('<script src="' + files[i] + '.js"></' + 'script>');
 			}
@@ -179,6 +256,10 @@
 	<script>
 		(function ($) {
 			window.hljs && hljs.configure({ classPrefix: '' });
+
+			$.mockjax({ url: '/api/login', data: { email: 'ibn@rubaxa.org', password: '123' }, status: 200 });
+			$.mockjax({ url: '/api/login', data: { email: 'ply@rubaxa.org', password: '123' }, status: 200 });
+			$.mockjax({ url: '/api/login', urlParams: ['email', 'password'], status: 400 });
 
 			$('.example')
 				.each(function () {
@@ -201,7 +282,8 @@
 					} catch (err) {}
 				})
 				.on('click', function () {
-					Function($(this).data('code'))();
+					var code = $.data(this, 'code');
+					Function(code)();
 					return false;
 				})
 			;

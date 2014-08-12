@@ -8,7 +8,8 @@
 (factory => {
 	'use strict';
 
-	if( typeof define === 'function' && define.amd ){
+	/* istanbul ignore next */
+	if (typeof define === 'function' && define.amd) {
 		define(factory);
 	}
 	else {
@@ -88,7 +89,7 @@
 	 * @returns {HTMLElement}
 	 */
 	_loading.get = () => {
-		return _loading.el || (_loading.el = _buildDOM({ tag: '.ply-loading', children: { '.ply-loading-spinner': true } }));
+		return _loading.el || (_loading.el = _buildDOM({ tag: '.ply-global-loading', children: { '.ply-loading-spinner': true } }));
 	};
 
 
@@ -301,7 +302,7 @@
 
 
 		// Событие инициализации
-		_this.options.init(this);
+		_this.options.oninit(this);
 	}
 
 
@@ -384,6 +385,26 @@
 
 
 		/**
+		 * jQuery выборка из слоя
+		 * @param   {String}  selector
+		 * @returns {jQuery}
+		 */
+		$: function (selector) {
+			return $(selector, this.layerEl);
+		},
+
+
+		/**
+		 * Найти элемент внутри слоя
+		 * @param   {String}  selector
+		 * @returns {HTMLElement}
+		 */
+		find: function (selector) {
+			return _querySelector(selector, this.layerEl);
+		},
+
+
+		/**
 		 * Применить эффект к элементу
 		 * @param   {HTMLElement}    el
 		 * @param   {String}         name
@@ -412,19 +433,31 @@
 			var ui = {
 					by: name,
 					state: name === 'submit',
-					layer: this,
 					data: this.context.toJSON(),
+					widget: this,
 					context: this.context
 				},
-				result = this.options.callback(ui)
+				el = this.el,
+				result = this.options.onaction(ui)
 			;
 
-			_cast(result).then((result) => {
-				if (result !== false) {
-					this.result = ui;
-					this.close();
-				}
-			});
+			if (!this.__lock) {
+				this.__lock = true;
+				this.el.className += ' ply-loading';
+
+				_cast(result)
+					.done(state => {
+						if (state !== false) {
+							this.result = ui;
+							this.close();
+						}
+					})
+					.always(() => {
+						this.__lock = false;
+						this.el.className = this.el.className.replace(/\s?ply-loading/, '');
+					})
+				;
+			}
 		},
 
 
@@ -559,7 +592,7 @@
 								_appendChild(_this.overlayEl, _this.overlayBoxEl);
 							}
 							// «Событие» open или close
-							_this.options[mode](_this);
+							_this.options['on' + mode](_this);
 						});
 					});
 				});
@@ -694,7 +727,7 @@
 			Ply.stack.remove(this);
 
 			this.visible = false;
-			this.options.destroy(this);
+			this.options.ondestroy(this);
 		}
 	};
 
@@ -753,7 +786,7 @@
 	};
 
 
-	Ply.version = '0.4.0';
+	Ply.version = '0.5.0';
 
 	return Ply;
 });

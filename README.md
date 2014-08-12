@@ -25,6 +25,7 @@ Create a dialog:
 Ply.dialog("alert", "Wow!").always(function (ui) {
 	ui.state; // true — "OK", false — "cancel"
 	ui.by; // submit, overlay, esc, "x"
+	ui.widget; // Ply instance
 });
 
 //or
@@ -120,11 +121,11 @@ var ply = new Ply({
 	},
 
 	// Callback
-	init: function () {},
-	open: function (ply) {},
-	close: function (ply) {},
-	destory: function (ply) {},
-	callback: function (ui) {},
+	oninit: function (ply) {},
+	onopen: function (ply) {},
+	onclose: function (ply) {},
+	ondestory: function (ply) {},
+	onaction: function (ui) {},
 });
 
 
@@ -392,9 +393,16 @@ Ply.dialog("subscribe", {
 
 ## Changelog
 
+
+ * Added `ply-loading`
+ * `ui.layer` -> `ui.widget`
+ * Added a `on` prefix to all callbacks
+
+
 ##### 0.4.0
  * + 'always' method (using inheritance «Promise»).
  * + Modularization
+
 
 ##### 0.3.0
  * #1: Testing and documentation

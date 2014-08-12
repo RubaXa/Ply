@@ -42,6 +42,7 @@ h1 {
 h2 {
 	position: relative;
 	font-size: 30px;
+	margin-left: -40px;
 	margin-bottom: 10px;
 }
 	/* anchors */
@@ -52,11 +53,11 @@ h2 {
 	}
 		h2 a:before {
 			right: 100%;
-			padding-right: 10px;
-			display: block;
 			content: '→';
-			position: absolute;
+			display: inline-block;
 			visibility: hidden;
+			line-height: 30px;
+			padding-right: 10px;
 		}
 
 		h2 a:hover:before,

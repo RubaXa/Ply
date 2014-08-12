@@ -1,5 +1,5 @@
 /**
- * @desc Найтроки по умолчанию
+ * @desc Настройки по умолчанию
  */
 
 module.exports = {
@@ -24,9 +24,9 @@ module.exports = {
 	baseHtml: true,
 
 	// Callback's
-	init: noop,
-	open: noop,
-	close: noop,
-	destroy: noop,
-	callback: noop
+	oninit: noop,
+	onopen: noop,
+	onclose: noop,
+	ondestroy: noop,
+	onaction: noop
 };

@@ -220,6 +220,12 @@
 	});
 
 
+	// Базовый жиалог
+	factory('base', (options, data, resolve) => {
+		resolve(_dialogFactory('base', options, data));
+	});
+
+
 	// Диалог: «Предупреждение»
 	factory('alert', (options, data, resolve) => {
 		resolve(_dialogFactory('alert', options, data, { ok: true }));
@@ -317,7 +323,7 @@
 							length:		length,
 							stack:		stack,
 							current:	current,
-							layer:		layer
+							widget:		layer
 						}, ui), dialogs);
 					},
 
@@ -365,7 +371,7 @@
 					_progress({}, layer);
 
 					//noinspection FunctionWithInconsistentReturnsJS
-					rootLayer.options.callback = (ui) => {
+					rootLayer.options.onaction = (ui) => {
 						if (interactive) {
 							return false;
 						}
@@ -397,7 +403,7 @@
 
 			return Ply.open(name, options, data).then((layer) => {
 				return _promise((resolve, reject) => {
-					layer.options.close = () => {
+					layer.options.onclose = () => {
 						(layer.result.state ? resolve : reject)(layer.result);
 					};
 				});

@@ -186,7 +186,7 @@
 							return !ui.state || $.post('/api/login', data).fail(function () {
 								$(ui.widget.el)
 									.addClass('ply-invalid')
-									.on('input', function () {
+									.one('input', function () {
 										$(this).removeClass('ply-invalid')
 									})
 								;

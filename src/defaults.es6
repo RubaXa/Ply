@@ -3,7 +3,10 @@
  */
 
 module.exports = {
+	clone: true,
 	zIndex: 10000,
+	rootTag: 'form',
+	baseHtml: true,
 
 	layer: {}, // css
 
@@ -21,9 +24,7 @@ module.exports = {
 		visibleOverlayInStack: false
 	},
 
-	baseHtml: true,
-
-	// Callback's
+	// Callbacks
 	oninit: noop,
 	onopen: noop,
 	onclose: noop,

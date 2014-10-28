@@ -130,7 +130,7 @@
 	});
 
 
-	test('effects:args', function () {
+	test('effects[args]:duration', function () {
 		Ply.effects.defaults = { duration: 300, open: {}, close: {} };
 
 		deepEqual(Ply.effects.get('scale[0.5,0.3]'), {

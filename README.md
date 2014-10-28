@@ -394,6 +394,7 @@ Ply.dialog("subscribe", {
 ## Changelog
 
 
+##### 0.5.0
  * Added `ply-loading`
  * `ui.layer` -> `ui.widget`
  * Added a `on` prefix to all callbacks

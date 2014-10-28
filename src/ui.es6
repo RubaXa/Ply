@@ -6,6 +6,9 @@
 ;;;(Ply => {
 	'use strict';
 
+	function _isNode(el) {
+		return el && el.appendChild;
+	}
 
 	function _toBlock(block, name) {
 		if (block == null) {
@@ -63,14 +66,15 @@
 	 */
 	ui.factory = function (name, renderer, simpleMode) {
 		ui[name.replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ')] = function (data, path) {
-			var fragment = document.createDocumentFragment();
+			var fragment = document.createDocumentFragment(), result;
 
 			if ((data != null) || name === ':root') {
 				data = simpleMode ? data : _toBlock(data);
 
 				_each(simpleMode ? data : data.children, function (block, key) {
-					var abs = ((path || name) + ' ' + key).replace(/^:\w+\s+/, '');
-					var el = ui(abs, _toBlock(block, key), abs);
+					var abs = ((path || name) + ' ' + key).replace(/^:\w+\s+/, ''),
+						el = _isNode(block) ? block : ui(abs, _toBlock(block, key), abs)
+					;
 
 					_appendChild(fragment, el);
 				});
@@ -79,10 +83,10 @@
 					delete data.children;
 				}
 
-				var result = renderer(data, fragment);
+				result = renderer(data, fragment);
 
 				/* istanbul ignore else */
-				if (!result.appendChild) {
+				if (!_isNode(result)) {
 					_extend(result, data);
 				}
 
@@ -164,7 +168,7 @@
 				renderer(options, data, resolve, reject);
 			}).then((el) => {
 				/* istanbul ignore else */
-				if (!el.appendChild) {
+				if (!_isNode(el)) {
 					el = ui(':root', el);
 				}
 
@@ -271,6 +275,10 @@
 	 * @returns {Promise}
 	 */
 	Ply.create = (name, options, data) => {
+		if (_isNode(name)) {
+			return _resolvePromise(new Ply(_extend(options || {}, { el: name })));
+		}
+
 		if (!data) {
 			data = options;
 			options = {};
@@ -305,7 +313,7 @@
 	 * @returns {Promise}
 	 */
 	Ply.dialog = (name, options, data) => {
-		if (name instanceof Object) {
+		if ((name instanceof Object) && !_isNode(name)) {
 			options = options || /* istanbul ignore next */ {};
 
 			return _promise((resolve, reject) => {
@@ -396,7 +404,7 @@
 			});
 		}
 		else {
-			if (!data) {
+			if (!data && !_isNode(name)) {
 				data = options || {};
 				options = {};
 			}

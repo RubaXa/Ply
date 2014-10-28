@@ -112,8 +112,8 @@ module.exports = {
 	},
 
 	'3d-flip-in': {
-		'from': (el, args) => {
-			Ply.effects.rotate3d(el, 0, 'Y', args || -70);
+		'from': (el, deg) => {
+			Ply.effects.rotate3d(el, 0, 'Y', deg || -70);
 		},
 		'to': (el) => {
 			_css(el.firstChild, { opacity: 1, transform: 'rotateY(0)' });
@@ -124,8 +124,8 @@ module.exports = {
 		'from': (el) => {
 			Ply.effects.rotate3d(el, 1, 'Y', 0);
 		},
-		'to': (el, args) => {
-			_css(el.firstChild, { opacity: 0, transform: 'rotateY(' + (args || 70) + 'deg)' });
+		'to': (el, deg) => {
+			_css(el.firstChild, { opacity: 0, transform: 'rotateY(' + (deg || 70) + 'deg)' });
 		}
 	},
 

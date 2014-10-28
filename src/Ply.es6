@@ -167,8 +167,10 @@
 	function _createPly(target, options, onlyLayer) {
 		// Корневой слой
 		target.wrapEl = _buildDOM({
-			tag: 'form',
-			css: { whiteSpace: 'nowrap', zIndex: options.zIndex }
+			tag: options.rootTag,
+			css: { whiteSpace: 'nowrap', zIndex: options.zIndex },
+			method: 'post',
+			action: '/'
 		});
 
 
@@ -192,7 +194,7 @@
 
 		// Контент
 		var el = options.el;
-		target.el = (el && el.cloneNode) ? el.cloneNode(true) : _buildDOM({ html: el || '' });
+		target.el = (el && el.cloneNode) ? (options.clone ? el.cloneNode(true) : el) : _buildDOM({ html: el || '' });
 
 
 		// Содержит контент
@@ -786,7 +788,7 @@
 	};
 
 
-	Ply.version = '0.5.0';
+	Ply.version = '0.6.0';
 
 	return Ply;
 });

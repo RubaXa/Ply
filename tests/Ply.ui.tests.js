@@ -1,6 +1,17 @@
 (function (Ply) {
 	module('Ply.ui');
 
+	asyncTest('dialog(el)', function () {
+		setTimeout(function () {
+			var el = Ply.stack.last.wrapEl;
+			el.getElementsByTagName('button')[0].click();
+		}, 50);
+
+		Ply.dialog(document.getElementById('dialog-el'), { clone: false, rootTag: 'div' }).always(function (ui) {
+			equal(ui.state, true);
+			start();
+		});
+	});
 
 	asyncTest('dialog("unknown")', function () {
 		setTimeout(function () {

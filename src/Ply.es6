@@ -788,7 +788,7 @@
 	};
 
 
-	Ply.version = '0.6.0';
+	Ply.version = '0.6.1';
 
 	return Ply;
 });

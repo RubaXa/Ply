@@ -78,8 +78,8 @@ if (NativePromise && !__promise__.always) {
 	Promise.prototype = Object.create(NativePromise.prototype);
 	Promise.prototype.constructor = Promise;
 
-	Promise.prototype.then = function (callback) {
-		var promise = NativePromise.prototype.then.call(this, callback);
+	Promise.prototype.then = function (doneFn, failFn) {
+		var promise = NativePromise.prototype.then.call(this, doneFn, failFn);
 		promise.__proto__ = this.__proto__; // for FireFox
 		return promise;
 	};

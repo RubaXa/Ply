@@ -9,6 +9,7 @@ module.exports = {
 	baseHtml: true,
 
 	layer: {}, // css
+	wrapper: {}, // css
 
 	overlay: {
 		opacity: .6,

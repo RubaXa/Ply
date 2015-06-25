@@ -103,7 +103,7 @@
 	 */
 	function _createLayer(contentEl, options) {
 		return _buildDOM({
-			css: {
+			css: _extend({
 				padding: '20px 20px 40px', // Сницу в два раза больше, так лучше
 				display: 'inline-block',
 				position: 'relative',
@@ -111,7 +111,7 @@
 				whiteSpace: 'normal',
 				verticalAlign: 'middle',
 				transform: 'translate3d(0, 0, 0)'
-			},
+			}, options.wrapper),
 			children: options.baseHtml ? [{
 				ply: ':layer',
 				tag: '.ply-layer',
@@ -480,6 +480,7 @@
 
 			handle['_' + target] = (evt) => {
 				var el = evt.target;
+
 				do {
 					if (el.nodeType === 1) {
 						if (el.getAttribute(_plyAttr) === target) {

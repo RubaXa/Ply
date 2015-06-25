@@ -100,6 +100,7 @@ module.exports = function (grunt){
 	grunt.registerTask('es', ['export', 'es6transpiler']);
 	grunt.registerTask('build', ['es', 'qunit']);
 	grunt.registerTask('min', ['uglify']);
+	grunt.registerTask('dev', ['es', 'watch']);
 	grunt.registerTask('quick', ['es', 'min']);
 	grunt.registerTask('default', ['version', 'build', 'min']);
 };

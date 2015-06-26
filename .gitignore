@@ -2,6 +2,5 @@ temp
 report
 .DS_Store
 node_modules
-Ply.js
 Ply.es6
 Ply.ui.js

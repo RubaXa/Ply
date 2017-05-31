@@ -47,6 +47,7 @@ Ply.dialog("confirm", "Do you like it?")
 	});
 ```
 
+![Base usage.png](https://i.imgur.com/riCFMwu.png)
 
 ---
 
